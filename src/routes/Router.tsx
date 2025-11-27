@@ -9,24 +9,17 @@ import Nominees from "../pages/Nominees";
 import NotFound from "../pages/NotFound";
 import Profile from "../pages/Profile";
 import Winners from "../pages/Winners";
-import Admin from "../pages/Admin";
+import RequireAuth from "../components/RequireAuth.tsx";
+import LayoutSystemComponent from "../components/Layouts/LayoutSystemComponent";
 
 const router = createBrowserRouter([
+  // GROUP 1: Standalone Pages
   {
     path: "/",
     element: (
       <>
         <Home />
         <PageTitleComponent title="Home" />
-      </>
-    ),
-  },
-  {
-    path: "nominees",
-    element: (
-      <>
-        <Nominees />
-        <PageTitleComponent title="Nominees" />
       </>
     ),
   },
@@ -48,63 +41,77 @@ const router = createBrowserRouter([
       </>
     ),
   },
+
+  // GROUP 2: Layout Pages (Header + Footer + Content)
   {
-    path: "winners",
-    element: (
-      <>
-        <Winners />
-        <PageTitleComponent title="Winners" />
-      </>
-    ),
-  },
-  {
-    path: "about",
-    element: (
-      <>
-        <About />
-        <PageTitleComponent title="About" />
-      </>
-    ),
-  },
-  {
-    path: "profile",
-    element: (
-      <>
-        <Profile />
-        <PageTitleComponent title="Profile" />
-      </>
-    ),
-  },
-  {
-    path: "leaderboard",
-    element: (
-      <>
-        <Leaderboard />
-        <PageTitleComponent title="Leaderboard" />
-      </>
-    ),
-  },
-  {
-    path: "admin",
-    element: (
-      <>
-        <Admin />
-        <PageTitleComponent title="Admin" />
-      </>
-    ),
-  },
-  {
-    path: "404",
-    element: (
-      <>
-        <NotFound />
-        <PageTitleComponent title="404" />
-      </>
-    ),
-  },
-  {
-    path: "*",
-    element: <Navigate to={"404"} />,
+    element: <LayoutSystemComponent />, // Wraps all children below
+    children: [
+      {
+        path: "about",
+        element: (
+          <>
+            <About />
+            <PageTitleComponent title="About" />
+          </>
+        ),
+      },
+      {
+        path: "winners",
+        element: (
+          <>
+            <Winners />
+            <PageTitleComponent title="Winners" />
+          </>
+        ),
+      },
+      {
+        path: "nominees",
+        element: (
+          <RequireAuth>
+            <>
+              <Nominees />
+              <PageTitleComponent title="Nominees" />
+            </>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: "profile",
+        element: (
+          <RequireAuth>
+            <>
+              <Profile />
+              <PageTitleComponent title="Profile" />
+            </>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: "leaderboard",
+        element: (
+          <RequireAuth>
+            <>
+              <Leaderboard />
+              <PageTitleComponent title="Leaderboard" />
+            </>
+          </RequireAuth>
+        ),
+      },
+
+      {
+        path: "404",
+        element: (
+          <>
+            <NotFound />
+            <PageTitleComponent title="404" />
+          </>
+        ),
+      },
+      {
+        path: "*",
+        element: <Navigate to={"404"} />,
+      },
+    ],
   },
 ]);
 

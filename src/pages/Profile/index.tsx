@@ -1,11 +1,8 @@
 import { useForm } from "react-hook-form";
 import ButtonComponent from "../../components/ButtonComponent";
 import InputComponent from "../../components/InputComponent";
-import LayoutSystemComponent from "../../components/Layouts/LayoutSystemComponent";
 
 interface IFormInput {
-  username: string;
-  email: string;
   password: string;
   newPassword: string;
   confirmPassword: string;
@@ -19,26 +16,9 @@ const Profile = () => {
   };
 
   return (
-    <LayoutSystemComponent>
       <div className="flex justify-center min-h-[85vh]">
         <div className="bg-zinc-900 p-8 shadow-md max-w-xl w-full mx-auto my-2 overflow-visible">
           <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="grid grid-cols-2 gap-4">
-              <InputComponent
-                label="Username"
-                type="text"
-                placeholder="Your Username"
-                {...register("username")}
-              />
-              <div>
-                <InputComponent
-                  label="Email"
-                  type="email"
-                  placeholder="Your Email"
-                  {...register("email")}
-                />
-              </div>
-            </div>
             <p className="text-white text-2xl mt-8 font-bold uppercase">
               Change Password
             </p>
@@ -72,7 +52,6 @@ const Profile = () => {
           </form>
         </div>
       </div>
-    </LayoutSystemComponent>
   );
 };
 

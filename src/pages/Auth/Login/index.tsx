@@ -5,6 +5,7 @@ import ButtonComponent from "../../../components/ButtonComponent";
 import InputComponent from "../../../components/InputComponent";
 import LayoutAuthComponent from "../../../components/Layouts/LayoutAuthComponent";
 import api from "../../../lib/api";
+import { AxiosError } from "axios";
 
 interface IFormInput {
   username: string;
@@ -18,12 +19,15 @@ const Login = () => {
 
   const onSubmit = async (data: IFormInput) => {
     try {
-      const response = await api.post("/login", data);
+      const response = await api.post("/auth/login", data);
       localStorage.setItem("jwt", response.data.token);
       nav("/nominees");
     } catch (error) {
-      console.log("Error logging in:", error.response.data.error);
-      setError(error.response.data.error);
+      if (error instanceof AxiosError) {
+        const msg = error.response?.data?.error ?? "Something went wrong";
+        console.log("Login error:", msg);
+        setError(msg);
+      }
     }
   };
 
@@ -64,14 +68,7 @@ const Login = () => {
         </Link>
         .
       </p>
-      <p className="text-sm text-center text-gray-400">
-        <Link
-          to={"/forgot-password"}
-          className="text-orange-500 focus:outline-none focus:underline hover:underline"
-        >
-          Forgot your password?
-        </Link>
-      </p>
+
     </LayoutAuthComponent>
   );
 };

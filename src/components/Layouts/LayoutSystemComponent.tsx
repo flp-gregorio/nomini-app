@@ -1,18 +1,13 @@
-import { ReactNode } from "react";
+import { Outlet } from "react-router-dom"; // Import Outlet
 import FooterComponent from "../FooterComponent";
 import HeaderComponent from "../HeaderComponent";
 
-
-interface Props {
-  children: ReactNode;
-}
-
-const LayoutSystemComponent = (props: Props) => {
+const LayoutSystemComponent = () => {
   return (
     <>
       <HeaderComponent />
       <div className="bg-fiery bg-cover antialiased mx-auto min-w-min min-h-screen">
-        {props.children}
+        <Outlet />
       </div>
       <FooterComponent />
     </>

@@ -4,7 +4,7 @@ const HeaderComponent = () => {
   return (
     <header className="text-gray-600 antialiased bg-zinc-900 font-montserrat font-bold text-xl md:text-1xl w-full tracking-tight">
       <div className="container mx-auto flex items-center justify-between px-5">
-        <nav className="md:flex md:items-center mx-auto grid grid-cols-1 w-full md:mx-56 md:max-w-screen-lg sm:w-full">
+        <nav className="md:flex md:items-center mx-auto grid grid-cols-1 w-full md:max-w-screen-lg sm:w-full">
           <div className="flex justify-between md:flex-row md:order-1 order-2 md:w-2/5 md:text-right">
             <Link
               to="/nominees"
@@ -50,6 +50,15 @@ const HeaderComponent = () => {
             >
               PROFILE
             </Link>
+            <button
+              onClick={() => {
+                localStorage.removeItem("jwt");
+                window.location.href = "/login";
+              }}
+              className="md:mx-5 text-white hover:text-orange-600 transition-all duration-500"
+            >
+              LOGOUT
+            </button>
           </div>
         </nav>
       </div>

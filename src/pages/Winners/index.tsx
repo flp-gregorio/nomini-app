@@ -1,180 +1,183 @@
 import { useState, useEffect } from "react";
 import { Category, Nominee } from "../../@types/NomineeType";
-import LayoutSystemComponent from "../../components/Layouts/LayoutSystemComponent";
-import NavigationComponent from "../../components/NavigationComponent";
 import api from "../../lib/api";
 
+// ----------------------------------------------------------------------
+// Types
+// ----------------------------------------------------------------------
+
+// Extend the base Nominee type to include the Winner boolean from data.json
+// We check for both "Winner" (from JSON) and "winner" (standard API) just in case
+interface NomineeWithStatus extends Nominee {
+  Winner?: boolean;
+  winner?: boolean;
+}
+
+// This represents the fully combined data for a single card
+type WinnerCardData = {
+  category: Category;
+  winnerNominee: NomineeWithStatus | null; // Null if no winner selected in JSON yet
+};
+
+// ----------------------------------------------------------------------
+// Component
+// ----------------------------------------------------------------------
 const Winners = () => {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
-  const [winners, setWinners] = useState<{ [key: number]: number }>({});
-  const [votes, setVotes] = useState<{ [key: number]: number[] }>({});
-  const [nominees, setNominees] = useState<Nominee[]>([]);
+  const [winnersData, setWinnersData] = useState<WinnerCardData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchAllData = async () => {
       try {
-        // Fetch categories
-        const categoryResponse = await api.get("/categories");
-        setCategories(categoryResponse.data);
+        setIsLoading(true);
 
-        // Fetch winners
-        const winnersResponse = await api.get("/winners");
-        const winnersMap = winnersResponse.data.reduce(
-          (
-            map: { [key: number]: number },
-            winner: { categoryid: number; nomineeid: number }
-          ) => {
-            map[winner.categoryid] = winner.nomineeid;
-            return map;
-          },
-          {}
-        );
-        setWinners(winnersMap);
+        // 1. Fetch Categories
+        const { data: categories } = await api.get<Category[]>("/categories");
 
-        // Fetch votes
-        const votesResponse = await api.get("/votes");
-        const votesMap = votesResponse.data.reduce(
-          (
-            map: { [key: number]: number[] },
-            vote: { categoryid: number; nomineeid: number }
-          ) => {
-            if (!map[vote.categoryid]) {
-              map[vote.categoryid] = [];
-            }
-            map[vote.categoryid][vote.nomineeid] =
-              (map[vote.categoryid][vote.nomineeid] || 0) + 1;
-            return map;
-          },
-          {}
-        );
-        setVotes(votesMap);
+        // 2. Parallel Fetch: Get nominees for ALL categories
+        // We no longer fetch "/votes/stats" because the winner is determined by the JSON boolean
+        const promisedResults = categories.map(async (category) => {
+          try {
+            // Fetch nominees for this specific category
+            const { data: nominees } = await api.get<NomineeWithStatus[]>(
+              `/categories/${category.id}/nominees`
+            );
+
+            // 3. Find the manual winner based on the boolean flag
+            // Checks for 'Winner' (capitalized as in your data.json) or 'winner'
+            const winnerNominee =
+              nominees.find((n) => n.Winner === true || n.winner === true) ||
+              null;
+
+            return {
+              category,
+              winnerNominee,
+            };
+          } catch (err) {
+            console.error(
+              `Failed to load data for category: ${category.title}`,
+              err
+            );
+            // Return a safe fallback so the whole page doesn't crash
+            return { category, winnerNominee: null };
+          }
+        });
+
+        // Wait for all requests to finish
+        const results = await Promise.all(promisedResults);
+        setWinnersData(results);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Critical error fetching winners:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
-    fetchData();
+
+    fetchAllData();
   }, []);
 
-  // Fetch nominees when a category is selected
-  useEffect(() => {
-    const currentCategory: Category = categories[currentCategoryIndex];
-    if (categories.length > 0 && currentCategory) {
-      const fetchNominees = async () => {
-        try {
-          const response = await api.get<Nominee[]>(
-            `/categories/${currentCategory.id}/nominees`
-          );
-          setNominees(response.data || []);
-        } catch (error) {
-          console.error("Failed to fetch nominees", error);
-        }
-      };
+  // ----------------------------------------------------------------------
+  // Render Helpers
+  // ----------------------------------------------------------------------
 
-      fetchNominees();
-    }
-  }, [currentCategoryIndex, categories]);
-
-  const handleNextCategory = () => {
-    setCurrentCategoryIndex((prevIndex) => (prevIndex + 1) % categories.length);
-  };
-
-  const handlePreviousCategory = () => {
-    setCurrentCategoryIndex(
-      (prevIndex) => (prevIndex - 1 + categories.length) % categories.length
-    );
-  };
-
-  const renderProgressBar = (
-    nominee: Nominee,
-    voteCount: number,
-    isWinner: boolean
-  ) => {
-    const maxVotes = Math.max(...(votes[currentCategory?.id] || []), 1);
-    const now = (voteCount / maxVotes) * 100;
-    const labelName = isWinner
-      ? `${nominee.name.toUpperCase()} • WINNER`
-      : nominee.name.toUpperCase();
-    const labelVotes = `${voteCount}`;
-    const progressBarBg = isWinner ? "bg-red-600" : "bg-orange-600";
-
+  if (isLoading) {
     return (
-      <div key={nominee.id} className="flex mb-3 md:h-10 h-fit">
-        <div className="w-full font-barlow">
-          <div className="w-full bg-zinc-900 pb-2 md:pb-0">
-            <div
-              className={`min-h-10 ${progressBarBg} flex text-white font-bold`}
-              style={{ width: `${now}%` }}
-            >
-              <div className="flex justify-between w-full px-4 items-center">
-                <div className="flex-grow md:text-nowrap text-white font-bold uppercase tracking-wider antialiased md:overflow-clip">
-                  {labelName}
-                </div>
-                <div className={`${voteCount === 0 ? "hidden" : "shown"}`}>
-                  {labelVotes}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <h2 className="text-white text-2xl font-barlow font-bold tracking-widest uppercase animate-pulse">
+          Loading Results...
+        </h2>
       </div>
-    );
-  };
-
-  const currentCategory: Category = categories[currentCategoryIndex];
-  const currentVotes = votes[currentCategory?.id] || [];
-
-  if (categories.length === 0 || !currentCategory) {
-    return (
-      <LayoutSystemComponent>
-        <div className="flex justify-center w-full">
-          <div className="bg-transparent md:px-10 flex flex-col w-3/4 mx-auto">
-            <div className="flex justify-center my-4">
-              <h1 className="text-white uppercase font-barlow text-2xl font-bold">
-                Category not available
-              </h1>
-            </div>
-          </div>
-        </div>
-      </LayoutSystemComponent>
     );
   }
 
-  const winnerId = winners[currentCategory.id];
-
-  console.log("currentCategory", currentCategory);
-  console.log("currentCategory.nominees", nominees);
-
   return (
-    <LayoutSystemComponent>
-      <NavigationComponent
-        onPrevious={handlePreviousCategory}
-        onNext={handleNextCategory}
-        headerText={currentCategory.title || "Category"}
-      />
-      <div className="flex justify-center w-full">
-        <div className="bg-transparent md:px-10 flex flex-col w-3/4 mx-auto">
-          <div className="flex justify-end my-4">
-            <h1 className="text-white uppercase font-barlow text-2xl font-bold">
-              {currentCategory.description}
-            </h1>
-          </div>
-          {currentCategory && nominees && nominees.length ? (
-            nominees.map((nominee) =>
-              renderProgressBar(
-                nominee,
-                currentVotes[nominee.id] || 0,
-                nominee.id === winnerId
-              )
-            )
-          ) : (
-            <div className="text-white text-center uppercase font-barlow text-1xl">
-              No nominees available for this category.
-            </div>
-          )}
-        </div>
+    <div className="w-full max-w-7xl mx-auto px-4 py-8">
+      {/* Header */}
+      <div className="text-center mb-12">
+        <h1 className="text-4xl md:text-6xl font-black text-white font-barlow uppercase tracking-tighter">
+          And the <span className="text-orange-500">Winners</span> are...
+        </h1>
+        <p className="text-zinc-400 mt-4 font-barlow text-lg">
+          Official results from The Game Awards 2025
+        </p>
       </div>
-    </LayoutSystemComponent>
+
+      {/* Grid Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {winnersData.map((item) => (
+          <div
+            key={item.category.id}
+            className={`group relative bg-zinc-900 border rounded-xl overflow-hidden shadow-lg transition-all duration-300 ${
+              item.winnerNominee
+                ? "border-orange-500/50 hover:shadow-orange-500/20"
+                : "border-zinc-800"
+            }`}
+          >
+            {/* Image Section */}
+            <div className="aspect-video w-full relative bg-black">
+              {item.winnerNominee ? (
+                <>
+                  <img
+                    src={item.winnerNominee.image}
+                    alt={item.winnerNominee.name}
+                    className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
+                  />
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent"></div>
+
+                  {/* Winner Badge */}
+                  <div className="absolute top-3 right-3 bg-orange-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg animate-pulse">
+                    Winner
+                  </div>
+                </>
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900/50">
+                  <div className="w-12 h-12 rounded-full border-2 border-zinc-700 flex items-center justify-center mb-2">
+                    <span className="text-zinc-500 text-xl font-bold">?</span>
+                  </div>
+                  <span className="text-zinc-500 font-barlow uppercase tracking-widest text-sm">
+                    Coming Soon
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Content Section */}
+            <div className="p-6 relative">
+              {/* Category Title (Eyebrow) */}
+              <h3 className="text-zinc-500 text-xs font-bold uppercase tracking-[0.2em] mb-2 font-barlow">
+                {item.category.title}
+              </h3>
+
+              {/* Winner Name */}
+              <h2
+                className={`text-2xl font-black uppercase leading-tight font-barlow italic ${
+                  item.winnerNominee ? "text-white" : "text-zinc-700"
+                }`}
+              >
+                {item.winnerNominee ? item.winnerNominee.name : "TBA"}
+              </h2>
+
+              {/* Description or Publisher */}
+              {item.winnerNominee && (
+                <p className="text-zinc-400 text-sm mt-2 line-clamp-2">
+                  {item.winnerNominee.description ||
+                    item.winnerNominee.publisher ||
+                    "No description available."}
+                </p>
+              )}
+
+              {!item.winnerNominee && (
+                <p className="text-zinc-600 text-sm mt-2 italic">
+                  Winner has not been announced yet.
+                </p>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 };
 

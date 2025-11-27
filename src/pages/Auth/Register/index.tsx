@@ -5,6 +5,7 @@ import ButtonComponent from "../../../components/ButtonComponent";
 import InputComponent from "../../../components/InputComponent";
 import LayoutAuthComponent from "../../../components/Layouts/LayoutAuthComponent";
 import api from "../../../lib/api";
+import { AxiosError } from "axios";
 
 interface IFormInput {
   username: string;
@@ -19,16 +20,25 @@ const Register = () => {
   const [error, setError] = useState<string | null>(null);
 
   const onSubmit = async (data: IFormInput) => {
+
+
+    if (data.password !== data.confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
     try {
-      await api.post("/users", {
+      await api.post("/auth/register", {
         username: data.username,
         email: data.email,
         password: data.password,
-        confirmPassword: data.confirmPassword
       });
+      nav("/login");
     } catch (error) {
-      console.log("Error registering:", error.response.data.error);
-      setError(error.response.data.error);
+      if (error instanceof AxiosError) {
+        const msg = error.response?.data?.error ?? "Something went wrong";
+        console.log("Error registering:", msg);
+        setError(msg);
+      }
     }
   };
 

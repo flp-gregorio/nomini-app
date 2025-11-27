@@ -15,7 +15,7 @@ export default {
         'barlow': ['Barlow', 'sans-serif'],
       },
       backgroundImage: {
-        'fiery': "url('../src/assets/imgs/bg.png')",
+        'fiery': "url('/imgs/bg.png')",
       },
     },
   },
