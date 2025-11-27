@@ -1,6 +1,6 @@
 const FooterComponent = () => {
   return (
-    <footer className="fixed bottom-0 bg-zinc-900 text-gray-600 body-font font-barlow w-full max-h-12 antialiased">
+    <footer className="bg-zinc-900 text-gray-600 body-font font-barlow w-full max-h-12 antialiased">
       <div className="container py-2 flex justify-evenly mx-auto">
         <span className="mr-auto pl-3">
           <a href="/about" className="text-sm text-gray-500">
