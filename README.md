@@ -1,6 +1,29 @@
-# Game Awards Sweepstake - Frontend 🎮🏆
+# CritPick 🎮🏆
 
-Welcome to the **Game Awards Sweepstake** frontend! This project is a fun and friendly sweepstake app where participants can predict the winners of the Game Awards. Built with React, TypeScript, and styled with TailwindCSS.
+Welcome to the **CritPick** frontend! This project is a fun and friendly Pick'em app where participants can predict the winners of the Game Awards. Built with React, TypeScript, and styled with TailwindCSS.
+
+## Project Structure
+
+```
+goty-bet/
+├── public/
+├── src/
+│   ├── assets/
+│   ├── components/
+│   ├── lib/
+│   ├── pages/
+│   ├── routes/
+│   ├── App.tsx
+│   ├── index.css
+│   └── main.tsx
+├── .env
+├── index.html
+├── package.json
+├── tailwind.config.js
+├── vercel.json
+├── vite.config.ts
+└── README.md
+```
 
 ## Features
 - 🏆 **Leaderboard**: Displays the top participants based on their predictions.
