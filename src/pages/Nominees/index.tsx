@@ -159,6 +159,8 @@ const Nominees = () => {
   
   const activeNominee = activeNominees[currentCategoryKey] || null;
 
+  const isLastCategory = currentCategoryIndex === categories.length - 1;
+
   return (
       <div className="flex flex-col items-center w-full">
         <NavigationComponent
@@ -241,7 +243,7 @@ const Nominees = () => {
             );
           })}
         </div>
-        <div className="pt-4">
+        <div className={isLastCategory ? "hidden" : "pt-4"}>
           <ButtonComponent text="Save Vote" onClick={onSaveVote} />
         </div>
       </div>
