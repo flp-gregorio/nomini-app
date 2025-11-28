@@ -86,12 +86,14 @@ const Nominees = () => {
 
   const handleNextCategory = () => {
     setCurrentCategoryIndex((prevIndex) => (prevIndex + 1) % categories.length);
+    window.scrollTo(0, 0);
   };
 
   const handlePreviousCategory = () => {
     setCurrentCategoryIndex(
       (prevIndex) => (prevIndex - 1 + categories.length) % categories.length
     );
+    window.scrollTo(0, 0);
   };
 
   const handleSetActiveCard = (nominee: string) => {
