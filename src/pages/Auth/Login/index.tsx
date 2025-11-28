@@ -21,6 +21,22 @@ const Login = () => {
     try {
       const response = await api.post("/auth/login", data);
       localStorage.setItem("jwt", response.data.token);
+
+      
+      try {
+        const { dataService } = await import("../../../services/dataService");
+        const { preloadImages } = await import("../../../utils/preloadImages");
+
+        const nominees = await dataService.getAllNominees();
+        const imageUrls = nominees
+          .map((n) => n.image)
+          .filter((url): url is string => !!url);
+
+        await preloadImages(imageUrls);
+      } catch (preloadError) {
+        console.error("Preloading failed, continuing anyway:", preloadError);
+      }
+
       nav("/nominees");
     } catch (error) {
       if (error instanceof AxiosError) {
