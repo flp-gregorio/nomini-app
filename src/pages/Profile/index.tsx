@@ -66,11 +66,11 @@ const Profile = () => {
   return (
     <div className="flex justify-center min-h-[85vh]">
       <div className="bg-zinc-900 p-8 shadow-md max-w-xl w-full mx-auto my-2 overflow-visible">
-        {username && (
+        <div>
           <div className="text-white text-xl mb-6 font-semibold text-center">
-            Hello, <span className="text-yellow-500">{username}</span>!
+            Hello, {username && <span className="text-orange-700">{username}</span>}!
           </div>
-        )}
+        </div>
         <form onSubmit={handleSubmit(onSubmit)}>
           <p className="text-white text-2xl mt-8 font-bold uppercase transition-colors">
             Change Password
