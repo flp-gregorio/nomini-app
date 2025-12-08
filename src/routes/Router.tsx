@@ -9,6 +9,7 @@ import Nominees from "../pages/Nominees";
 import NotFound from "../pages/NotFound";
 import Profile from "../pages/Profile";
 import Winners from "../pages/Winners";
+import Admin from "../pages/Admin";
 import RequireAuth from "../components/RequireAuth.tsx";
 import LayoutSystemComponent from "../components/Layouts/LayoutSystemComponent";
 
@@ -38,6 +39,15 @@ const router = createBrowserRouter([
       <>
         <Register />
         <PageTitleComponent title="CritPick - Register" />
+      </>
+    ),
+  },
+  {
+    path: "admin",
+    element: (
+      <>
+        <Admin />
+        <PageTitleComponent title="CritPick - Admin" />
       </>
     ),
   },

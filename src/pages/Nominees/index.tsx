@@ -5,6 +5,9 @@ import ButtonComponent from "../../components/ButtonComponent";
 import api from "../../lib/api";
 import { AxiosError } from "axios";
 
+// TODO: Update this to the actual event start time
+const EVENT_START_TIME = new Date("2025-12-12T21:30:00-03:00");
+
 // Types
 type JsonNominee = {
   Nominee?: string;
@@ -39,39 +42,43 @@ const Nominees = () => {
   const [categories, setCategories] = useState<JsonCategory[]>([]);
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   const [activeNominees, setActiveNominees] = useState<
     Record<string, string | null>
   >({});
+  const [voteIds, setVoteIds] = useState<Record<string, number>>({});
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        
+
         const categoriesRes = await api.get<JsonCategory[]>("/categories");
         const fetchedCategories = categoriesRes.data;
-        
+
         const categoriesWithNominees = await Promise.all(fetchedCategories.map(async (cat) => {
-             const nomineesRes = await api.get<JsonNominee[]>(`/categories/${cat.id}/nominees`);
-             return { ...cat, nominees: nomineesRes.data };
+          const nomineesRes = await api.get<JsonNominee[]>(`/categories/${cat.id}/nominees`);
+          return { ...cat, nominees: nomineesRes.data };
         }));
 
         setCategories(categoriesWithNominees);
 
         const token = localStorage.getItem("jwt");
         if (token) {
-            try {
-                const votesRes = await api.get<UserVote[]>("/votes/user");
-                const votes = votesRes.data;
-                const votesMap: Record<string, string> = {};
-                votes.forEach((vote) => {
-                    votesMap[vote.category] = vote.nominee;
-                });
-                setActiveNominees(votesMap);
-            } catch (err) {
-                console.error("Failed to fetch user votes", err);
-            }
+          try {
+            const votesRes = await api.get<UserVote[]>("/votes/user");
+            const votes = votesRes.data;
+            const votesMap: Record<string, string> = {};
+            const idsMap: Record<string, number> = {};
+            votes.forEach((vote) => {
+              votesMap[vote.category] = vote.nominee;
+              idsMap[vote.category] = vote.id;
+            });
+            setActiveNominees(votesMap);
+            setVoteIds(idsMap);
+          } catch (err) {
+            console.error("Failed to fetch user votes", err);
+          }
         }
 
       } catch (error) {
@@ -123,116 +130,81 @@ const Nominees = () => {
     }
 
     try {
-      await api.post("/votes", {
-        category: currentCategoryKey,
-        nominee: activeNominee,
-      });
+      const existingVoteId = voteIds[currentCategoryKey];
+
+      if (existingVoteId) {
+        // Update existing vote (PUT)
+        await api.put(`/votes/${existingVoteId}`, {
+          nominee: activeNominee,
+        });
+      } else {
+        // Create new vote (POST)
+        const res = await api.post("/votes", {
+          category: currentCategoryKey,
+          nominee: activeNominee,
+        });
+
+        // Update voteIds with the new vote ID
+        if (res.data.vote?.id) {
+          setVoteIds(prev => ({
+            ...prev,
+            [currentCategoryKey]: res.data.vote.id
+          }));
+        }
+      }
 
       handleNextCategory();
     } catch (error) {
       console.error("Failed to save vote:", error);
       if (error instanceof AxiosError) {
-        if (error.response?.status === 409) {
-           alert("You changed your vote!"); 
-        } else {
-            const errorData = error.response?.data;
-            alert(errorData?.message || "An error occurred");
-            return;
-        }
+        const errorData = error.response?.data;
+        alert(errorData?.message || "An error occurred");
       }
     }
   };
 
   if (isLoading) {
-      return <div className="text-white text-center mt-20">Loading...</div>;
+    return <div className="text-white text-center mt-20">Loading...</div>;
   }
 
   if (categories.length === 0) {
-      return <div className="text-white text-center mt-20">No categories found.</div>;
+    return <div className="text-white text-center mt-20">No categories found.</div>;
   }
 
   const currentCategory = categories[currentCategoryIndex];
   const currentCategoryKey = currentCategory.title || "Unknown Category";
-  
+
   const cardsData = currentCategory.nominees ?? [];
   const numCards = cardsData.length ? Math.min(cardsData.length, 6) : 0;
-  
+
   const activeNominee = activeNominees[currentCategoryKey] || null;
 
   const isLastCategory = currentCategoryIndex === categories.length - 1;
+  const isVotingClosed = new Date() >= EVENT_START_TIME;
 
   return (
-      <div className="flex flex-col items-center w-full">
-        <NavigationComponent
-          onPrevious={handlePreviousCategory}
-          onNext={handleNextCategory}
-          headerText={currentCategoryKey}
-        />
-        <p className="my-4 text-neutral-50 font-barlow tracking-wider md:max-w-2xl text-center mx-2 min-h-[48px]">
-          {currentCategory.description}
-        </p>
+    <div className="flex flex-col items-center w-full">
+      <NavigationComponent
+        onPrevious={handlePreviousCategory}
+        onNext={handleNextCategory}
+        headerText={currentCategoryKey}
+      />
+      <p className="my-4 text-neutral-50 font-barlow tracking-wider md:max-w-2xl text-center mx-2 min-h-[48px]">
+        {currentCategory.description}
+      </p>
 
-        <div className="hidden md:flex flex-col">
-          <div className="grid gap-6 grid-cols-3 grid-rows-1">
-            {cardsData.slice(0, 3).map((nomineeData, index) => {
-              const title =
-                nomineeData.Nominee ?? nomineeData.name ?? "Unknown";
-              const aux = nomineeData.Publisher ?? nomineeData.publisher ?? nomineeData.developer ?? "";
-              const genre = nomineeData.Genre ?? nomineeData.genre ?? "";
-              const background = nomineeData.Image ?? nomineeData.image ?? "";
-
-              return (
-                <CardComponent
-                  key={`${currentCategoryKey}-top-${index}`}
-                  nominee={title}
-                  aux={aux}
-                  genre={genre}
-                  background={background}
-                  active={title === activeNominee}
-                  setActiveCard={handleSetActiveCard}
-                />
-              );
-            })}
-          </div>
-
-          <div className="col-span-3 flex justify-center mt-6 flex-row">
-            <div
-              className={`grid gap-6 ${
-                numCards % 3 === 0 ? "grid-cols-3" : "grid-cols-2"
-              } grid-rows-1`}
-            >
-              {cardsData.slice(3, numCards).map((nomineeData, index) => {
-                const title =
-                  nomineeData.Nominee ?? nomineeData.name ?? "Unknown";
-                const aux =
-                  nomineeData.Publisher ?? nomineeData.publisher ?? nomineeData.developer ?? "";
-                const genre = nomineeData.Genre ?? nomineeData.genre ?? "";
-                const background = nomineeData.Image ?? nomineeData.image ?? "";
-                return (
-                  <CardComponent
-                    key={`${currentCategoryKey}-bottom-${index}`}
-                    nominee={title}
-                    aux={aux}
-                    genre={genre}
-                    background={background}
-                    active={title === activeNominee}
-                    setActiveCard={handleSetActiveCard}
-                  />
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        <div className="md:hidden grid gap-6 grid-cols-1 pb-12">
-          {cardsData.map((nomineeData, index) => {
-            const title = nomineeData.Nominee ?? nomineeData.name ?? "Unknown";
+      <div className="hidden md:flex flex-col">
+        <div className="grid gap-6 grid-cols-3 grid-rows-1">
+          {cardsData.slice(0, 3).map((nomineeData, index) => {
+            const title =
+              nomineeData.Nominee ?? nomineeData.name ?? "Unknown";
             const aux = nomineeData.Publisher ?? nomineeData.publisher ?? nomineeData.developer ?? "";
             const genre = nomineeData.Genre ?? nomineeData.genre ?? "";
             const background = nomineeData.Image ?? nomineeData.image ?? "";
+
             return (
               <CardComponent
-                key={`${currentCategoryKey}-mobile-${index}`}
+                key={`${currentCategoryKey}-top-${index}`}
                 nominee={title}
                 aux={aux}
                 genre={genre}
@@ -243,10 +215,64 @@ const Nominees = () => {
             );
           })}
         </div>
-        <div className={isLastCategory ? "hidden" : "pt-4"}>
-          <ButtonComponent text="Save Vote" onClick={onSaveVote} />
+
+        <div className="col-span-3 flex justify-center mt-6 flex-row">
+          <div
+            className={`grid gap-6 ${numCards % 3 === 0 ? "grid-cols-3" : "grid-cols-2"
+              } grid-rows-1`}
+          >
+            {cardsData.slice(3, numCards).map((nomineeData, index) => {
+              const title =
+                nomineeData.Nominee ?? nomineeData.name ?? "Unknown";
+              const aux =
+                nomineeData.Publisher ?? nomineeData.publisher ?? nomineeData.developer ?? "";
+              const genre = nomineeData.Genre ?? nomineeData.genre ?? "";
+              const background = nomineeData.Image ?? nomineeData.image ?? "";
+              return (
+                <CardComponent
+                  key={`${currentCategoryKey}-bottom-${index}`}
+                  nominee={title}
+                  aux={aux}
+                  genre={genre}
+                  background={background}
+                  active={title === activeNominee}
+                  setActiveCard={handleSetActiveCard}
+                />
+              );
+            })}
+          </div>
         </div>
       </div>
+
+      <div className="md:hidden grid gap-6 grid-cols-1 pb-12">
+        {cardsData.map((nomineeData, index) => {
+          const title = nomineeData.Nominee ?? nomineeData.name ?? "Unknown";
+          const aux = nomineeData.Publisher ?? nomineeData.publisher ?? nomineeData.developer ?? "";
+          const genre = nomineeData.Genre ?? nomineeData.genre ?? "";
+          const background = nomineeData.Image ?? nomineeData.image ?? "";
+          return (
+            <CardComponent
+              key={`${currentCategoryKey}-mobile-${index}`}
+              nominee={title}
+              aux={aux}
+              genre={genre}
+              background={background}
+              active={title === activeNominee}
+              setActiveCard={handleSetActiveCard}
+            />
+          );
+        })}
+      </div>
+      <div className={isLastCategory ? "hidden" : "pt-4"}>
+        {isVotingClosed ? (
+          <div className="text-red-500 font-bold text-xl mt-4">
+            Voting is closed.
+          </div>
+        ) : (
+          <ButtonComponent text="Save Vote" onClick={onSaveVote} />
+        )}
+      </div>
+    </div>
   );
 };
 
