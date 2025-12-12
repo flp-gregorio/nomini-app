@@ -6,7 +6,7 @@ import api from "../../lib/api";
 import { AxiosError } from "axios";
 
 // TODO: Update this to the actual event start time
-const EVENT_START_TIME = new Date("2025-12-12T21:30:00-03:00");
+const EVENT_START_TIME = new Date("2025-12-11T21:30:00-03:00");
 
 // Types
 type JsonNominee = {
