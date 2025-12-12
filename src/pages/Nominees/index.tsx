@@ -264,13 +264,11 @@ const Nominees = () => {
         })}
       </div>
       <div className={isLastCategory ? "hidden" : "pt-4"}>
-        {isVotingClosed ? (
-          <div className="text-red-500 font-bold text-xl mt-4">
-            Voting is closed.
-          </div>
-        ) : (
-          <ButtonComponent text="Save Vote" onClick={onSaveVote} />
-        )}
+        <ButtonComponent
+          text={isVotingClosed ? "Voting Closed" : "Save Vote"}
+          onClick={onSaveVote}
+          disabled={isVotingClosed}
+        />
       </div>
     </div>
   );
