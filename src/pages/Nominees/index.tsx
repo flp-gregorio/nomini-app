@@ -267,7 +267,7 @@ const Nominees = () => {
           );
         })}
       </div>
-      <div className={isLastCategory ? "hidden" : "pt-4"}>
+      <div className={isLastCategory || isVotingClosed ? "hidden" : "pt-4"}>
         <ButtonComponent
           text={isVotingClosed ? "Voting Closed" : "Save Vote"}
           onClick={onSaveVote}
