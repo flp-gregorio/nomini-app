@@ -104,7 +104,7 @@ const Nominees = () => {
   };
 
   const handleSetActiveCard = (nominee: string) => {
-    if (!categories.length) return;
+    if (!categories.length || isVotingClosed) return;
     const currentCategoryKey = categories[currentCategoryIndex].title || "";
     setActiveNominees((prev) => ({
       ...prev,
@@ -114,6 +114,10 @@ const Nominees = () => {
   };
 
   const onSaveVote = async () => {
+    if (isVotingClosed) {
+      alert("Voting is closed!");
+      return;
+    }
     if (!categories.length) return;
     const currentCategoryKey = categories[currentCategoryIndex].title || "";
     const activeNominee = activeNominees[currentCategoryKey];
