@@ -20,7 +20,7 @@ const router = createBrowserRouter([
     element: (
       <>
         <Home />
-        <PageTitleComponent title="CritPick - Home" />
+        <PageTitleComponent title="Nomini - Home" />
       </>
     ),
   },
@@ -29,7 +29,7 @@ const router = createBrowserRouter([
     element: (
       <>
         <Login />
-        <PageTitleComponent title="CritPick - Login" />
+        <PageTitleComponent title="Nomini - Login" />
       </>
     ),
   },
@@ -38,7 +38,7 @@ const router = createBrowserRouter([
     element: (
       <>
         <Register />
-        <PageTitleComponent title="CritPick - Register" />
+        <PageTitleComponent title="Nomini - Register" />
       </>
     ),
   },
@@ -47,7 +47,7 @@ const router = createBrowserRouter([
     element: (
       <>
         <Admin />
-        <PageTitleComponent title="CritPick - Admin" />
+        <PageTitleComponent title="Nomini - Admin" />
       </>
     ),
   },
@@ -61,7 +61,7 @@ const router = createBrowserRouter([
         element: (
           <>
             <About />
-            <PageTitleComponent title="CritPick - About" />
+            <PageTitleComponent title="Nomini - About" />
           </>
         ),
       },
@@ -70,7 +70,7 @@ const router = createBrowserRouter([
         element: (
           <>
             <Winners />
-            <PageTitleComponent title="CritPick - Winners" />
+            <PageTitleComponent title="Nomini - Winners" />
           </>
         ),
       },
@@ -80,7 +80,7 @@ const router = createBrowserRouter([
           <RequireAuth>
             <>
               <Nominees />
-              <PageTitleComponent title="CritPick - Nominees" />
+              <PageTitleComponent title="Nomini - Nominees" />
             </>
           </RequireAuth>
         ),
@@ -91,7 +91,7 @@ const router = createBrowserRouter([
           <RequireAuth>
             <>
               <Profile />
-              <PageTitleComponent title="CritPick - Profile" />
+              <PageTitleComponent title="Nomini - Profile" />
             </>
           </RequireAuth>
         ),
@@ -102,7 +102,7 @@ const router = createBrowserRouter([
           <RequireAuth>
             <>
               <Leaderboard />
-              <PageTitleComponent title="CritPick - Leaderboard" />
+              <PageTitleComponent title="Nomini - Leaderboard" />
             </>
           </RequireAuth>
         ),
@@ -113,7 +113,7 @@ const router = createBrowserRouter([
         element: (
           <>
             <NotFound />
-            <PageTitleComponent title="CritPick - 404" />
+            <PageTitleComponent title="Nomini - 404" />
           </>
         ),
       },
