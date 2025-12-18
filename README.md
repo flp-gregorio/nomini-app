@@ -1,6 +1,6 @@
-# CritPick 🎮🏆
+# Nomini 🎮🏆
 
-Welcome to the **CritPick** frontend! This project is a fun and friendly Pick'em app where participants can predict the winners of the Game Awards. Built with React, TypeScript, and styled with TailwindCSS.
+Welcome to the **Nomini** frontend! This project is a fun and friendly Pick'em app where participants can predict the winners of the Game Awards. Built with React, TypeScript, and styled with TailwindCSS.
 
 ## Project Structure
 
