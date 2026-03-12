@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../../lib/api";
 
-
 type JsonNominee = {
     id: string;
     name: string;
@@ -16,9 +15,9 @@ type JsonCategory = {
 
 const Admin = () => {
     const [categories, setCategories] = useState<JsonCategory[]>([]);
-    const [adminKey, setAdminKey] = useState("");
     const [message, setMessage] = useState("");
     const [isLoading, setIsLoading] = useState(true);
+    const [isAdmin, setIsAdmin] = useState<boolean | null>(null); // null = loading
 
     // Event date state
     const [currentEventDate, setCurrentEventDate] = useState<string | null>(null);
@@ -27,9 +26,23 @@ const Admin = () => {
     const [isEventLoading, setIsEventLoading] = useState(false);
 
     useEffect(() => {
-        fetchData();
-        fetchEventDate();
+        checkAdmin();
     }, []);
+
+    const checkAdmin = async () => {
+        try {
+            const res = await api.get<{ username: string; email: string; admin: boolean }>("/auth/me");
+            if (res.data.admin) {
+                setIsAdmin(true);
+                fetchData();
+                fetchEventDate();
+            } else {
+                setIsAdmin(false);
+            }
+        } catch {
+            setIsAdmin(false);
+        }
+    };
 
     const fetchEventDate = async () => {
         try {
@@ -64,16 +77,10 @@ const Admin = () => {
     };
 
     const handleSetWinner = async (category: string, nominee: string) => {
-        if (!adminKey) {
-            alert("Please enter the Admin Key");
-            return;
-        }
-
         try {
             const res = await api.post("/categories/winner", {
                 category,
                 nominee,
-                adminKey,
             });
             setMessage(res.data.message);
             fetchData();
@@ -84,15 +91,10 @@ const Admin = () => {
     };
 
     const handleSetEventDate = async (dateValue: string | null) => {
-        if (!adminKey) {
-            alert("Please enter the Admin Key");
-            return;
-        }
         setIsEventLoading(true);
         setEventMessage("");
         try {
             const res = await api.post("/event", {
-                adminKey,
                 eventDate: dateValue,
             });
             setEventMessage(res.data.message);
@@ -114,8 +116,31 @@ const Admin = () => {
         });
     };
 
+    // Loading state
+    if (isAdmin === null) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-neutral-900">
+                <div className="text-white text-xl font-barlow animate-pulse">Checking access...</div>
+            </div>
+        );
+    }
+
+    // Not admin
+    if (!isAdmin) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-screen bg-neutral-900 gap-4">
+                <h1 className="text-4xl font-bold text-red-500 font-barlow">Access Denied</h1>
+                <p className="text-zinc-400 font-barlow">You do not have admin privileges.</p>
+            </div>
+        );
+    }
+
     if (isLoading) {
-        return <div className="text-white text-center mt-20">Loading...</div>;
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-neutral-900">
+                <div className="text-white text-xl font-barlow animate-pulse">Loading admin data...</div>
+            </div>
+        );
     }
 
     return (
@@ -123,18 +148,6 @@ const Admin = () => {
             <h1 className="text-4xl font-bold mb-8 font-cinzel text-yellow-500">
                 Admin Panel
             </h1>
-
-            {/* Admin Key Input */}
-            <div className="mb-8 w-full max-w-md">
-                <label className="block text-sm font-bold mb-2">Admin Key</label>
-                <input
-                    type="password"
-                    value={adminKey}
-                    onChange={(e) => setAdminKey(e.target.value)}
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    placeholder="Enter Admin Key"
-                />
-            </div>
 
             {/* Winner feedback message */}
             {message && (
