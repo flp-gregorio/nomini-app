@@ -1,73 +1,93 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import ButtonComponent from "../../components/ButtonComponent";
+import api from "../../lib/api";
 
 const Home = () => {
   const [countdown, setCountdown] = useState("");
-  const [voteLink, setVoteLink] = useState("/nominees"); // Default to /login if logged in
+  const [showDays, setShowDays] = useState(false);
+  const [voteLink, setVoteLink] = useState("/nominees");
+  const [eventDate, setEventDate] = useState<Date | null | undefined>(undefined); // undefined = loading
 
   useEffect(() => {
-    const checkToken = async () => {
-      const token = localStorage.getItem("jwt");
+    const token = localStorage.getItem("jwt");
+    setVoteLink(token ? "/nominees" : "/login");
 
-      if (token) {
-        setVoteLink("/nominees"); // Set to the desired path when logged in
-      } else {
-        setVoteLink("/login"); // No token found
-      }
-    };
+    // Fetch event date from backend
+    api.get<{ eventDate: string | null }>("/event")
+      .then(res => {
+        setEventDate(res.data.eventDate ? new Date(res.data.eventDate) : null);
+      })
+      .catch(() => {
+        // Fall back to a hardcoded date if the API is unreachable
+        setEventDate(new Date("2026-12-11T23:00:00.000Z"));
+      });
+  }, []);
 
-    checkToken(); // Check token immediately
+  useEffect(() => {
+    // Don't start the countdown until we know the event date
+    if (eventDate === undefined) return;
 
     const calculateCountdown = () => {
-      const targetDate = new Date("2025-12-11 20:00:00 GMT-0300");
+      if (!eventDate) {
+        setCountdown("TBA");
+        setShowDays(false);
+        return;
+      }
+
       const now = new Date();
-      const timeDifference = targetDate.getTime() - now.getTime();
+      const timeDifference = eventDate.getTime() - now.getTime();
 
       if (timeDifference > 0) {
         const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
         setCountdown(days.toString());
+        setShowDays(true);
       } else {
         setCountdown("The Game Awards are happening right now!");
+        setShowDays(false);
       }
     };
 
     calculateCountdown();
-
     const countdownInterval = setInterval(calculateCountdown, 1000);
-
-    return () => {
-      clearInterval(countdownInterval);
-    };
-  }, []);
+    return () => clearInterval(countdownInterval);
+  }, [eventDate]);
 
   return (
-    <div className="bg-zinc-950 flex justify-center items-center w-screen">
-      <div className="w-1/2 h-screen hidden lg:block">
-        <img
-          src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/0c228eac-01a7-4410-892f-c9128f0141e6/df1x7oe-2a99051d-6df8-4e10-8667-49e3b5a648ce.png/v1/fill/w_1191,h_671,q_70,strp/malenia_elden_ring_by_knotshoxtm_df1x7oe-pre.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9NzIxIiwicGF0aCI6IlwvZlwvMGMyMjhlYWMtMDFhNy00NDEwLTg5MmYtYzkxMjhmMDE0MWU2XC9kZjF4N29lLTJhOTkwNTFkLTZkZjgtNGUxMC04NjY3LTQ5ZTNiNWE2NDhjZS5wbmciLCJ3aWR0aCI6Ijw9MTI4MCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.eVdd_8ZThJvQkDKxaHJWpIsAwRM3RsIVDx4ROSFgufA"
-          alt="Placeholder Image"
-          className="object-cover w-full h-full"
-        />
+    <div className="bg-zinc-950 flex flex-col justify-center items-center w-screen h-screen overflow-hidden relative">
+
+      {/* Subtle Background Accent - Steam Style */}
+      <div className="absolute inset-0 z-0 pointer-events-none"
+        style={{
+          backgroundImage: "radial-gradient(circle at 50% 100%, rgba(234, 88, 12, 0.08) 0%, transparent 40%)"
+        }}>
       </div>
-      <div className="sm:20 w-full lg:w-1/2 min-h-screen uppercase font-montserrat flex flex-col justify-center">
-        <div className="mt-6 text-center">
-          <div className="container px-5 mx-auto flex flex-wrap">
-            <div className="w-full sm:p-4 mb-6 gap-4 flex flex-col items-center">
-              <h1 className="font-bold text-2xl text-gray-100 ">
-                The Game Awards are happening in:
-              </h1>
-              <h2 className="font-bold text-7xl font-barlow text-gray-100 tracking-wider">
-                {countdown}
-              </h2>
-              <p className="text-gray-100 text-2xl font-bold ">Days</p>
-              <div className="w-60 mx-auto font-bold tracking-widest">
-                <Link to={voteLink}>
-                  <ButtonComponent text="Vote" />
-                </Link>
-              </div>
-            </div>
-          </div>
+
+      <div className="relative z-10 flex flex-col items-center gap-12 sm:gap-16">
+
+        {/* Main Title - Massive & Clean */}
+        <div className="flex flex-col items-center gap-2">
+          <h1 className="text-6xl sm:text-8xl md:text-9xl font-black font-barlow text-white tracking-tighter leading-none uppercase text-center select-none">
+            Nomini
+          </h1>
+          <div className="w-24 h-1.5 bg-orange-600"></div>
+        </div>
+
+        {/* Countdown Section */}
+        <div className="flex flex-col items-center gap-4">
+          <h2 className="font-black text-8xl sm:text-9xl md:text-[12rem] font-barlow text-white tracking-tighter leading-none select-none tabular-nums opacity-90">
+            {eventDate === undefined ? "..." : countdown}
+          </h2>
+
+          <p className="text-zinc-500 text-lg sm:text-xl font-medium font-montserrat uppercase tracking-[0.4em]">
+            {eventDate === undefined ? "" : showDays ? "Days Remaining" : eventDate === null ? "Date not set" : "Live Now"}
+          </p>
+        </div>
+
+        <div className="mt-4 sm:mt-8">
+          <Link to={voteLink}>
+            <ButtonComponent text="Vote Now" />
+          </Link>
         </div>
       </div>
     </div>

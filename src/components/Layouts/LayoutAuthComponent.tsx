@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 interface Props {
   title: string;
   description: string;
-  src: string;
+  sideContent: ReactNode;
   children: ReactNode;
 }
 
@@ -11,13 +11,8 @@ const LayoutAuthComponent = (props: Props) => {
   return (
     <div className="bg-zinc-950">
       <div className="flex justify-center h-screen">
-        <div
-          className="hidden bg-cover lg:block lg:w-2/3"
-          style={{
-            backgroundImage: `url(${props.src})`,
-          }}
-        >
-          <div className="flex items-center h-full px-20 bg-gray-900 bg-opacity-40"></div>
+        <div className="hidden lg:block lg:w-2/3 relative">
+          {props.sideContent}
         </div>
         <div className="flex items-center w-full max-w-md px-6 mx-auto lg:w-2/6 bg-zinc-950">
           <div className="flex-1">

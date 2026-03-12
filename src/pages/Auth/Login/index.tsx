@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import SideHero from "../../../components/SideHero";
 import ButtonComponent from "../../../components/ButtonComponent";
 import InputComponent from "../../../components/InputComponent";
 import LayoutAuthComponent from "../../../components/Layouts/LayoutAuthComponent";
@@ -22,7 +23,7 @@ const Login = () => {
       const response = await api.post("/auth/login", data);
       localStorage.setItem("jwt", response.data.token);
 
-      
+
       try {
         const { dataService } = await import("../../../services/dataService");
         const { preloadImages } = await import("../../../utils/preloadImages");
@@ -49,7 +50,17 @@ const Login = () => {
 
   return (
     <LayoutAuthComponent
-      src="https://media.wired.com/photos/6516df152a96d14834d98190/master/w_1920,c_limit/EA-FC-Is-Just-FIFA-Culture.jpg"
+      sideContent={
+        <SideHero
+          title={
+            <h1 className="text-7xl lg:text-9xl font-black font-barlow text-white tracking-tighter leading-none uppercase">
+              Enter <br />
+              The Arena
+            </h1>
+          }
+          subtitle="Log in. Vote. Dominate the season."
+        />
+      }
       title="Login"
       description="Sign in to access your account"
     >

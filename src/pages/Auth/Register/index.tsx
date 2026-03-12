@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import SideHero from "../../../components/SideHero";
 import ButtonComponent from "../../../components/ButtonComponent";
 import InputComponent from "../../../components/InputComponent";
 import LayoutAuthComponent from "../../../components/Layouts/LayoutAuthComponent";
@@ -44,7 +45,17 @@ const Register = () => {
 
   return (
     <LayoutAuthComponent
-      src="https://media.wired.com/photos/6516df152a96d14834d98190/master/w_1920,c_limit/EA-FC-Is-Just-FIFA-Culture.jpg"
+      sideContent={
+        <SideHero
+          title={
+            <h1 className="text-7xl lg:text-9xl font-black font-barlow text-white tracking-tighter leading-none uppercase">
+              Join <br />
+              The Ranks
+            </h1>
+          }
+          subtitle="Register. Predict. Claim your victory."
+        />
+      }
       title="Register"
       description="Create an account to get started"
     >
