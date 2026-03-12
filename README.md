@@ -122,16 +122,6 @@ This generates the optimized static assets inside the `dist/` directory.
 
 ---
 
-## 🎨 UI & Theming
-
-Nomini leverages a heavy, premium theme utilizing specific Google fonts imported in `index.css` and extended in `tailwind.config.js`:
-
-- **Barlow:** Used for massive headers, numbers (countdown), and section titles.
-- **Montserrat:** Used for subtitles, tracking-widest text, and UI elements.
-- **Dark Theme:** Grounded in zinc tones (`zinc-900`, `zinc-950`) contrasted with primary action colors (`orange-600`, `yellow-500` for admin).
-
----
-
 ## 🛡️ Authentication Flow
 
 The frontend handles JWT authentication implicitly through Axios interconnectivity:
