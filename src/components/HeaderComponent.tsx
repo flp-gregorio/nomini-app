@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const HeaderComponent = () => {
+  const [profileOpen, setProfileOpen] = useState(false);
+
   return (
     <header className="text-gray-600 antialiased bg-zinc-900 font-montserrat font-bold text-xl md:text-1xl w-full tracking-tight">
       <div className="container mx-auto flex items-center justify-between px-5">
@@ -44,21 +47,40 @@ const HeaderComponent = () => {
             >
               LEADERBOARD
             </Link>
-            <Link
-              to="/profile"
-              className="md:mx-5 text-white hover:text-orange-600 transition-all duration-500"
+            {/* Profile with dropdown */}
+            <div
+              className="relative md:mx-5"
+              onMouseEnter={() => setProfileOpen(true)}
+              onMouseLeave={() => setProfileOpen(false)}
             >
-              PROFILE
-            </Link>
-            <button
-              onClick={() => {
-                localStorage.removeItem("jwt");
-                window.location.href = "/login";
-              }}
-              className="md:mx-5 text-white hover:text-orange-600 transition-all duration-500"
-            >
-              LOGOUT
-            </button>
+              <Link
+                to="/profile"
+                className="text-white hover:text-orange-600 transition-all duration-500"
+              >
+                PROFILE
+              </Link>
+              {profileOpen && (
+                <div className="absolute right-0 top-full mt-0 pt-2 z-50 min-w-[160px]">
+                  <div className="bg-zinc-800 border border-zinc-700 rounded-lg shadow-xl overflow-hidden">
+                    <Link
+                      to="/profile"
+                      className="block px-5 py-3 text-sm text-white hover:bg-zinc-700 hover:text-orange-500 transition-colors"
+                    >
+                      MY PROFILE
+                    </Link>
+                    <button
+                      onClick={() => {
+                        localStorage.removeItem("jwt");
+                        window.location.href = "/login";
+                      }}
+                      className="block w-full text-left px-5 py-3 text-sm text-white hover:bg-zinc-700 hover:text-red-400 transition-colors border-t border-zinc-700"
+                    >
+                      LOGOUT
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </nav>
       </div>

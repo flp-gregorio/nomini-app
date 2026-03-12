@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import WhiteButtonComponent from "../../components/WhiteButtonComponent";
 import api from "../../lib/api";
 
-// Define the exact shape returned by our new backend route
 type LeaderboardUser = {
   id: number;
   username: string;
@@ -12,12 +11,13 @@ type LeaderboardUser = {
 const Leaderboard = () => {
   const [users, setUsers] = useState<LeaderboardUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [years, setYears] = useState<number[]>([]);
+  const [selectedYear, setSelectedYear] = useState<number | null>(null); // null = global
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 10;
-  
-  // Derived State for Pagination
+
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
@@ -33,13 +33,30 @@ const Leaderboard = () => {
     }
   };
 
+  // Fetch available years on mount
+  useEffect(() => {
+    const fetchYears = async () => {
+      try {
+        const { data } = await api.get<number[]>("/categories/years");
+        setYears(data);
+      } catch (error) {
+        console.error("Error fetching years:", error);
+      }
+    };
+    fetchYears();
+  }, []);
+
+  // Fetch leaderboard when selectedYear changes
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
         setIsLoading(true);
-        const response = await api.get<LeaderboardUser[]>("/leaderboard");
-        
-        // The backend returns a sorted array, so we just set it
+        setCurrentPage(1);
+        const url = selectedYear
+          ? `/leaderboard?year=${selectedYear}`
+          : "/leaderboard";
+        const response = await api.get<LeaderboardUser[]>(url);
+
         if (Array.isArray(response.data)) {
           setUsers(response.data);
         } else {
@@ -53,13 +70,40 @@ const Leaderboard = () => {
     };
 
     fetchLeaderboard();
-  }, []);
+  }, [selectedYear]);
 
   return (
     <div className="container mx-auto px-4 md:px-20 pt-4 text-center antialiased pb-20">
-      <h1 className="font-bold text-white mb-8 font-montserrat uppercase text-3xl">
+      <h1 className="font-bold text-white mb-6 font-montserrat uppercase text-3xl">
         Leaderboard
       </h1>
+
+      {/* Year/Global Tabs */}
+      <div className="flex justify-center gap-3 mb-8 flex-wrap">
+        <button
+          onClick={() => setSelectedYear(null)}
+          className={`px-5 py-2 rounded-full font-barlow font-bold text-sm uppercase tracking-wider transition-all duration-300 ${
+            selectedYear === null
+              ? "bg-orange-600 text-white shadow-lg shadow-orange-600/30"
+              : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white"
+          }`}
+        >
+          Global
+        </button>
+        {years.map((year) => (
+          <button
+            key={year}
+            onClick={() => setSelectedYear(year)}
+            className={`px-5 py-2 rounded-full font-barlow font-bold text-sm uppercase tracking-wider transition-all duration-300 ${
+              selectedYear === year
+                ? "bg-orange-600 text-white shadow-lg shadow-orange-600/30"
+                : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white"
+            }`}
+          >
+            {year}
+          </button>
+        ))}
+      </div>
 
       {isLoading ? (
         <div className="text-white font-barlow animate-pulse">Calculating Scores...</div>
@@ -67,10 +111,8 @@ const Leaderboard = () => {
         <>
           <ul className="font-montserrat uppercase w-full max-w-4xl mx-auto">
             {currentUsers.map((user, index) => {
-              // Calculate actual rank based on pagination
               const rank = indexOfFirstUser + index + 1;
-              
-              // Highlight top 3
+
               let rankColor = "text-white";
               if (rank === 1) rankColor = "text-yellow-400";
               if (rank === 2) rankColor = "text-gray-300";
@@ -91,7 +133,7 @@ const Leaderboard = () => {
                       {user.username}
                     </span>
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
                     <span className="text-orange-500 text-xl">{user.points}</span>
                     <span className="text-zinc-500 text-xs">PTS</span>
