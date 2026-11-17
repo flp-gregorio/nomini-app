@@ -58,7 +58,7 @@ const Login = () => {
               The Arena
             </h1>
           }
-          subtitle="Log in. Vote. Dominate the season."
+          subtitle="Log in. Vote. Dominate The Game Awards 2026 season."
         />
       }
       title="Login"

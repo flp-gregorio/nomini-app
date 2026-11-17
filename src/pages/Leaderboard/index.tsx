@@ -74,9 +74,14 @@ const Leaderboard = () => {
 
   return (
     <div className="container mx-auto px-4 md:px-20 pt-4 text-center antialiased pb-20">
-      <h1 className="font-bold text-white mb-6 font-montserrat uppercase text-3xl">
+      <h1 className="font-bold text-white mb-2 font-montserrat uppercase text-3xl">
         Leaderboard
       </h1>
+      <p className="text-zinc-400 text-center mb-6 font-barlow text-base">
+        {selectedYear
+          ? `The Game Awards ${selectedYear} Edition Rankings`
+          : "All-Time Global Rankings Across All Editions"}
+      </p>
 
       {/* Year/Global Tabs */}
       <div className="flex justify-center gap-3 mb-8 flex-wrap">
@@ -100,7 +105,7 @@ const Leaderboard = () => {
                 : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white"
             }`}
           >
-            {year}
+            {year === 2026 ? "2026 (Current)" : year}
           </button>
         ))}
       </div>

@@ -177,11 +177,19 @@ const Nominees = () => {
   };
 
   if (isLoading) {
-    return <div className="text-white text-center mt-20">Loading...</div>;
+    return (
+      <div className="text-white text-center mt-20 font-barlow uppercase tracking-widest">
+        Loading 2026 Nominees...
+      </div>
+    );
   }
 
   if (categories.length === 0) {
-    return <div className="text-white text-center mt-20">No categories found.</div>;
+    return (
+      <div className="text-white text-center mt-20 font-barlow uppercase tracking-widest">
+        No 2026 categories found.
+      </div>
+    );
   }
 
   const currentCategory = categories[currentCategoryIndex];
@@ -197,6 +205,11 @@ const Nominees = () => {
 
   return (
     <div className="flex flex-col items-center w-full">
+      <div className="mt-4 text-center">
+        <span className="text-orange-500 text-xs font-bold font-montserrat uppercase tracking-[0.3em]">
+          The Game Awards 2026 • Official Nominations ({currentCategoryIndex + 1}/{categories.length})
+        </span>
+      </div>
       <NavigationComponent
         onPrevious={handlePreviousCategory}
         onNext={handleNextCategory}

@@ -119,7 +119,7 @@ const Winners = () => {
 
       {/* Subtitle */}
       <p className="text-zinc-400 text-center mb-8 font-barlow text-lg">
-        Official results from The Game Awards {selectedYear}
+        Official results from The Game Awards {selectedYear ?? 2026}
       </p>
 
       {isLoading ? (

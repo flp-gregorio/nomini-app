@@ -5,13 +5,15 @@ const About = () => {
         <h1 className="text-3xl font-bold">About</h1>
         <p className="mt-4">
           Nomini is a web application that allows users to nominate their
-          favorite games for the upcoming The Game Awards and get ranked based on their predictions.
+          favorite games for The Game Awards 2026 — taking place live on
+          December 10, 2026 at Peacock Theater in Los Angeles, California — and
+          get ranked based on their predictions.
         </p>
         <p className="mt-4">
-          Users can nominate their winner prediction for all oficial categories.
-          The app will display the popular vote winners, the official winners,
-          and rank the users in a global leaderboard to see who can predict the
-          industry the most.
+          Users can nominate their winner prediction for all official 2026
+          categories. The app displays the official winners, preserves
+          historical 2025 results, and ranks users on the 2026 and all-time
+          global leaderboards to see who can predict the industry best.
         </p>
         <p className="mt-4">
           Nomini is a project created by{" "}

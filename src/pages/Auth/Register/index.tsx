@@ -53,7 +53,7 @@ const Register = () => {
               The Ranks
             </h1>
           }
-          subtitle="Register. Predict. Claim your victory."
+          subtitle="Register. Predict. Claim your 2026 victory."
         />
       }
       title="Register"

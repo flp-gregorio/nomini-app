@@ -1,7 +1,7 @@
 <p align="center">
   <h1 align="center">🎮 Nomini App</h1>
   <p align="center">
-    Frontend application for <strong>Nomini</strong> — a dynamic and sleek social voting platform for predicting award show winners.
+    Frontend application for <strong>Nomini</strong> — a dynamic and sleek social voting platform for predicting winners of <strong>The Game Awards 2026</strong> (December 10, 2026 at Peacock Theater, Los Angeles, California).
     <br />
     Features a bold, premium industrial design language tailored for gamers.
   </p>

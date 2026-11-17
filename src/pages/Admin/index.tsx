@@ -148,9 +148,12 @@ const Admin = () => {
 
     return (
         <div className="flex flex-col items-center w-full min-h-screen bg-neutral-900 text-white p-8">
-            <h1 className="text-4xl font-bold mb-8 font-cinzel text-yellow-500">
+            <h1 className="text-4xl font-bold mb-2 font-cinzel text-yellow-500">
                 Admin Panel
             </h1>
+            <p className="text-neutral-400 font-barlow uppercase tracking-widest text-sm mb-8">
+                The Game Awards 2026 • December 10, 2026 • Peacock Theater, Los Angeles
+            </p>
 
             {/* Winner feedback message */}
             {message && (
@@ -162,7 +165,7 @@ const Admin = () => {
             {/* ── Event Date Section ── */}
             <div className="w-full max-w-4xl mb-10">
                 <div className="bg-neutral-800 p-6 rounded-lg shadow-lg border border-yellow-600/30">
-                    <h2 className="text-2xl font-bold mb-1 text-yellow-400">Event Settings</h2>
+                    <h2 className="text-2xl font-bold mb-1 text-yellow-400">Event Settings (TGA 2026)</h2>
                     <p className="text-neutral-400 text-sm mb-5">
                         Current event date:{" "}
                         <span className="text-white font-semibold">

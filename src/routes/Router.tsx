@@ -20,7 +20,7 @@ const router = createBrowserRouter([
     element: (
       <>
         <Home />
-        <PageTitleComponent title="Nomini - Home" />
+        <PageTitleComponent title="Nomini - The Game Awards 2026" />
       </>
     ),
   },
@@ -47,7 +47,7 @@ const router = createBrowserRouter([
     element: (
       <>
         <Admin />
-        <PageTitleComponent title="Nomini - Admin" />
+        <PageTitleComponent title="Nomini - Admin (TGA 2026)" />
       </>
     ),
   },
@@ -61,7 +61,7 @@ const router = createBrowserRouter([
         element: (
           <>
             <About />
-            <PageTitleComponent title="Nomini - About" />
+            <PageTitleComponent title="Nomini - About (TGA 2026)" />
           </>
         ),
       },
@@ -70,7 +70,7 @@ const router = createBrowserRouter([
         element: (
           <>
             <Winners />
-            <PageTitleComponent title="Nomini - Winners" />
+            <PageTitleComponent title="Nomini - Winners (TGA 2026)" />
           </>
         ),
       },
@@ -80,7 +80,7 @@ const router = createBrowserRouter([
           <RequireAuth>
             <>
               <Nominees />
-              <PageTitleComponent title="Nomini - Nominees" />
+              <PageTitleComponent title="Nomini - 2026 Nominees" />
             </>
           </RequireAuth>
         ),
@@ -102,7 +102,7 @@ const router = createBrowserRouter([
           <RequireAuth>
             <>
               <Leaderboard />
-              <PageTitleComponent title="Nomini - Leaderboard" />
+              <PageTitleComponent title="Nomini - Leaderboard (TGA 2026)" />
             </>
           </RequireAuth>
         ),
