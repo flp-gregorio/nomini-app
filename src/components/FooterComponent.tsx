@@ -14,13 +14,13 @@ const FooterComponent = () => {
         </div>
 
         <div className="inline-flex items-center gap-4">
-          <span className="text-sm text-zinc-500">© 2026 Felipe Gregorio</span>
+          <span className="text-sm text-zinc-400">© 2026 Felipe Gregorio</span>
           <a
             href="https://www.instagram.com/felipe.gregoriooo/"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Instagram"
-            className="text-zinc-500 hover:text-[#F5F5F5] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A] p-1"
+            className="text-zinc-400 hover:text-[#F5F5F5] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A] p-1"
           >
             <svg
               fill="none"
@@ -38,7 +38,7 @@ const FooterComponent = () => {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="LinkedIn"
-            className="text-zinc-500 hover:text-[#F5F5F5] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A] p-1"
+            className="text-zinc-400 hover:text-[#F5F5F5] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A] p-1"
           >
             <svg
               fill="currentColor"

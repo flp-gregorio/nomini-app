@@ -54,7 +54,7 @@ const Home = () => {
   }, [eventDate]);
 
   return (
-    <div className="bg-zinc-950 flex flex-col justify-center items-center w-full min-h-screen overflow-x-hidden relative px-4 sm:px-8 py-8">
+    <main className="bg-zinc-950 flex flex-col justify-center items-center w-full min-h-screen overflow-x-hidden relative px-4 sm:px-8 py-8">
 
       {/* Subtle Background Accent - Steam Style */}
       <div className="absolute inset-0 z-0 pointer-events-none"
@@ -102,7 +102,7 @@ const Home = () => {
         </div>
 
       </div>
-    </div>
+    </main>
   );
 };
 

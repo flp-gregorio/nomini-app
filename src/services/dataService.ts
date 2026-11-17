@@ -150,6 +150,15 @@ export const dataService = {
     return categories.flatMap((category) => category.nominees ?? []);
   },
 
+  getCachedWinners: (year?: number): WinnersResponse | null => {
+    const key = `catalog:winners:${year ?? "latest"}`;
+    const existing = cache.get(key);
+    if (existing && existing.expiresAt > Date.now()) {
+      return existing.value as WinnersResponse;
+    }
+    return null;
+  },
+
   getWinners: async (year?: number, force = false) => {
     const query = year ? `?year=${year}` : "";
     const result = await cachedGet<WinnersResponse>(

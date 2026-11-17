@@ -9,7 +9,7 @@ interface Props {
 
 const LayoutAuthComponent = (props: Props) => {
   return (
-    <div className="bg-zinc-950">
+    <main className="bg-zinc-950">
       <div className="flex justify-center h-screen">
         <div className="hidden lg:block lg:w-2/3 relative">
           {props.sideContent}
@@ -29,7 +29,7 @@ const LayoutAuthComponent = (props: Props) => {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 

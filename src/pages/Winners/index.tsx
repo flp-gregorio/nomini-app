@@ -25,6 +25,18 @@ const Winners = () => {
       return;
     }
 
+    const cached = dataService.getCachedWinners(selectedYear ?? undefined);
+    if (cached) {
+      loadedYearRef.current = cached.year;
+      setYears(cached.years);
+      if (selectedYear === null && cached.year) {
+        setSelectedYear(cached.year);
+      }
+      setWinnersData(cached.categories);
+      setIsLoading(false);
+      return;
+    }
+
     let isMounted = true;
 
     const fetchWinners = async () => {
@@ -53,6 +65,29 @@ const Winners = () => {
       isMounted = false;
     };
   }, [selectedYear]);
+
+  // Idle-prefetch alternate seasons (e.g. 2025) so year tab switching is instant
+  useEffect(() => {
+    if (isLoading || years.length <= 1 || selectedYear === null) return;
+    const otherYears = years.filter((y) => y !== selectedYear);
+    if (otherYears.length === 0) return;
+
+    const prefetchOthers = () => {
+      otherYears.forEach((y) => {
+        if (!dataService.getCachedWinners(y)) {
+          void dataService.getWinners(y).catch(() => {});
+        }
+      });
+    };
+
+    if (typeof window.requestIdleCallback === "function") {
+      const id = window.requestIdleCallback(prefetchOthers, { timeout: 1500 });
+      return () => window.cancelIdleCallback(id);
+    }
+
+    const timer = window.setTimeout(prefetchOthers, 400);
+    return () => window.clearTimeout(timer);
+  }, [isLoading, years, selectedYear]);
 
   return (
     <div className="w-[94%] max-w-[1800px] mx-auto px-2 sm:px-4 py-6">
@@ -92,13 +127,13 @@ const Winners = () => {
           aria-label="Loading results"
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 lg:gap-6"
         >
-          {Array.from({ length: 8 }).map((_, idx) => (
+          {Array.from({ length: Math.max(winnersData.length, 12) }).map((_, idx) => (
             <div
               key={idx}
               className="bg-zinc-900 border border-zinc-800 overflow-hidden animate-pulse"
             >
               <div className="aspect-video w-full bg-zinc-800/70" />
-              <div className="p-6 space-y-3">
+              <div className="p-6 min-h-[152px] space-y-3">
                 <div className="h-3 w-1/2 bg-zinc-800" />
                 <div className="h-6 w-3/4 bg-zinc-800" />
                 <div className="h-4 w-full bg-zinc-800/70" />
@@ -111,19 +146,21 @@ const Winners = () => {
           {winnersData.map((item, index) => (
             <div
               key={item.category.id}
-              className={`group relative bg-zinc-900 border overflow-hidden shadow-lg transition-all duration-300 ${
+              className={`group relative bg-zinc-900 border overflow-hidden shadow-lg transition-all duration-300 flex flex-col ${
                 item.winnerNominee
                   ? "border-orange-500/50 hover:shadow-orange-500/20"
                   : "border-zinc-800"
               }`}
             >
               {/* Image Section */}
-              <div className="aspect-video w-full relative bg-black">
+              <div className="aspect-video w-full relative bg-black shrink-0">
                 {item.winnerNominee ? (
                   <>
                     <img
                       src={item.winnerNominee.image}
                       alt={item.winnerNominee.name}
+                      width={420}
+                      height={236}
                       loading={index < 8 ? "eager" : "lazy"}
                       decoding="async"
                       referrerPolicy="no-referrer"
@@ -147,7 +184,7 @@ const Winners = () => {
               </div>
 
               {/* Content Section */}
-              <div className="p-6 relative">
+              <div className="p-6 min-h-[152px] relative flex-1">
                 <h3 className="text-zinc-500 text-xs font-bold uppercase tracking-[0.2em] mb-2 font-barlow">
                   {item.category.title}
                 </h3>
