@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Category, Nominee } from "../../@types/NomineeType";
 import { dataService } from "../../services/dataService";
 
@@ -17,9 +17,14 @@ const Winners = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [years, setYears] = useState<number[]>([]);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const loadedYearRef = useRef<number | null>(null);
 
   // Fetch consolidated winners (and available years) in a single request
   useEffect(() => {
+    if (selectedYear !== null && loadedYearRef.current === selectedYear) {
+      return;
+    }
+
     let isMounted = true;
 
     const fetchWinners = async () => {
@@ -28,6 +33,7 @@ const Winners = () => {
         const data = await dataService.getWinners(selectedYear ?? undefined);
         if (!isMounted) return;
 
+        loadedYearRef.current = data.year;
         setYears(data.years);
         if (selectedYear === null && data.year) {
           setSelectedYear(data.year);
@@ -47,17 +53,6 @@ const Winners = () => {
       isMounted = false;
     };
   }, [selectedYear]);
-
-  if (isLoading && years.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh]">
-        <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <h2 className="text-white text-2xl font-barlow font-bold tracking-widest uppercase animate-pulse">
-          Loading Results...
-        </h2>
-      </div>
-    );
-  }
 
   return (
     <div className="w-[94%] max-w-[1800px] mx-auto px-2 sm:px-4 py-6">
@@ -93,15 +88,27 @@ const Winners = () => {
       </div>
 
       {isLoading ? (
-        <div className="flex flex-col items-center justify-center min-h-[40vh]">
-          <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-          <h2 className="text-white text-lg font-barlow font-bold uppercase animate-pulse">
-            Loading...
-          </h2>
+        <div
+          aria-label="Loading results"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 lg:gap-6"
+        >
+          {Array.from({ length: 8 }).map((_, idx) => (
+            <div
+              key={idx}
+              className="bg-zinc-900 border border-zinc-800 overflow-hidden animate-pulse"
+            >
+              <div className="aspect-video w-full bg-zinc-800/70" />
+              <div className="p-6 space-y-3">
+                <div className="h-3 w-1/2 bg-zinc-800" />
+                <div className="h-6 w-3/4 bg-zinc-800" />
+                <div className="h-4 w-full bg-zinc-800/70" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 lg:gap-6">
-          {winnersData.map((item) => (
+          {winnersData.map((item, index) => (
             <div
               key={item.category.id}
               className={`group relative bg-zinc-900 border overflow-hidden shadow-lg transition-all duration-300 ${
@@ -117,6 +124,9 @@ const Winners = () => {
                     <img
                       src={item.winnerNominee.image}
                       alt={item.winnerNominee.name}
+                      loading={index < 8 ? "eager" : "lazy"}
+                      decoding="async"
+                      referrerPolicy="no-referrer"
                       className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent"></div>

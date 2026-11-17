@@ -1,18 +1,25 @@
-import { ComponentProps, forwardRef } from "react";
+import { ComponentProps, forwardRef, useId } from "react";
 
 interface Props extends Omit<ComponentProps<"input">, "label"> {
   label: string;
 }
 
 const InputComponent = forwardRef<HTMLInputElement, Props>(
-  ({ label, ...rest }, ref) => {
+  ({ label, id, ...rest }, ref) => {
+    const generatedId = useId();
+    const inputId = id ?? generatedId;
+
     return (
       <div className="mt-6 font-montserrat">
-        <label className="block mb-2 text-sm text-gray-600 dark:text-gray-200 uppercase">
+        <label
+          htmlFor={inputId}
+          className="block mb-2 text-sm text-gray-600 dark:text-gray-200 uppercase"
+        >
           {label}
         </label>
         <input
           {...rest}
+          id={inputId}
           ref={ref}
           className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-zinc-950
            border border-gray-200 dark:placeholder-gray-600 dark:text-gray-300 
@@ -23,5 +30,7 @@ const InputComponent = forwardRef<HTMLInputElement, Props>(
     );
   }
 );
+
+InputComponent.displayName = "InputComponent";
 
 export default InputComponent;

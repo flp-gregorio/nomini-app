@@ -26,9 +26,9 @@ const Login = () => {
       const response = await api.post("/auth/login", data);
       localStorage.setItem("jwt", response.data.token);
 
-      // Warm public categories catalog in parallel without blocking navigation
+      // Warm public categories catalog and user context in parallel without blocking navigation
       void dataService.getCategoriesWithNominees().catch(() => {});
-      await refreshUser();
+      void refreshUser();
 
       nav("/nominees");
     } catch (error) {
@@ -60,6 +60,7 @@ const Login = () => {
         <InputComponent
           label="Username"
           type="text"
+          autoComplete="username"
           placeholder="Your Username"
           {...register("username")}
         />
@@ -67,6 +68,7 @@ const Login = () => {
         <InputComponent
           label="Password"
           type="password"
+          autoComplete="current-password"
           placeholder="Your Password"
           {...register("password")}
         />

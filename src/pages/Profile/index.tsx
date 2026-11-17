@@ -76,6 +76,7 @@ const Profile = () => {
             <InputComponent
               label="CURRENT PASSWORD"
               type="password"
+              autoComplete="current-password"
               placeholder=""
               {...register("password", { required: "Current password is required" })}
             />
@@ -89,6 +90,7 @@ const Profile = () => {
             <InputComponent
               label="NEW PASSWORD"
               type="password"
+              autoComplete="new-password"
               placeholder=""
               {...register("newPassword", { required: "New password is required", minLength: { value: 6, message: "Password must be at least 6 characters" } })}
             />
@@ -102,6 +104,7 @@ const Profile = () => {
             <InputComponent
               label="CONFIRM NEW PASSWORD"
               type="password"
+              autoComplete="new-password"
               placeholder=""
               {...register("confirmPassword", { required: "Confirm password is required" })}
             />

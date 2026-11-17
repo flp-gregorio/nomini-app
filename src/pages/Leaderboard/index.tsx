@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import WhiteButtonComponent from "../../components/WhiteButtonComponent";
 import api from "../../lib/api";
 import { dataService } from "../../services/dataService";
@@ -14,6 +14,7 @@ const Leaderboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [years, setYears] = useState<number[]>([]);
   const [selectedYear, setSelectedYear] = useState<number | null>(null); // null = global
+  const tabCacheRef = useRef<Record<string, LeaderboardUser[]>>({});
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -47,8 +48,18 @@ const Leaderboard = () => {
     fetchYears();
   }, []);
 
-  // Fetch leaderboard when selectedYear changes
+  // Fetch leaderboard when selectedYear changes (reuse cached tabs within this mount)
   useEffect(() => {
+    const cacheKey = selectedYear ? String(selectedYear) : "global";
+    const cached = tabCacheRef.current[cacheKey];
+    if (cached) {
+      setCurrentPage(1);
+      setUsers(cached);
+      setIsLoading(false);
+      return;
+    }
+
+    let isMounted = true;
     const fetchLeaderboard = async () => {
       try {
         setIsLoading(true);
@@ -58,19 +69,23 @@ const Leaderboard = () => {
           : "/leaderboard";
         const response = await api.get<LeaderboardUser[]>(url);
 
-        if (Array.isArray(response.data)) {
-          setUsers(response.data);
-        } else {
-          setUsers([]);
-        }
+        if (!isMounted) return;
+        const rows = Array.isArray(response.data) ? response.data : [];
+        tabCacheRef.current[cacheKey] = rows;
+        setUsers(rows);
       } catch (error) {
         console.error("Error fetching leaderboard:", error);
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
-    fetchLeaderboard();
+    void fetchLeaderboard();
+    return () => {
+      isMounted = false;
+    };
   }, [selectedYear]);
 
   return (

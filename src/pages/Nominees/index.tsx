@@ -64,6 +64,7 @@ const Nominees = () => {
   const [voteIds, setVoteIds] = useState<Record<string, number>>({});
 
   const feedbackTimerRef = useRef<number | null>(null);
+  const preloadedUrlsRef = useRef<Set<string>>(new Set());
 
   const showFeedback = useCallback(
     (nextFeedback: FeedbackState, autoClearMs?: number) => {
@@ -212,6 +213,41 @@ const Nominees = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleNextCategory, handlePreviousCategory]);
 
+  // Preload adjacent categories' artwork in idle time for instant transitions
+  useEffect(() => {
+    if (categories.length <= 1) return;
+
+    const preloadCategoryImages = () => {
+      const len = categories.length;
+      const adjacentIndices = [
+        (currentCategoryIndex + 1) % len,
+        (currentCategoryIndex - 1 + len) % len,
+      ];
+
+      adjacentIndices.forEach((idx) => {
+        const nominees = categories[idx]?.nominees ?? [];
+        nominees.forEach((n) => {
+          const url = n.artwork?.imageUrl ?? n.Image ?? n.image;
+          if (!url || preloadedUrlsRef.current.has(url)) return;
+          preloadedUrlsRef.current.add(url);
+          const img = new Image();
+          img.referrerPolicy = "no-referrer";
+          img.src = url;
+        });
+      });
+    };
+
+    if (typeof window.requestIdleCallback === "function") {
+      const idleId = window.requestIdleCallback(preloadCategoryImages, {
+        timeout: 1000,
+      });
+      return () => window.cancelIdleCallback(idleId);
+    }
+
+    const timerId = window.setTimeout(preloadCategoryImages, 200);
+    return () => window.clearTimeout(timerId);
+  }, [categories, currentCategoryIndex]);
+
   const isVotingClosed = eventStartTime ? new Date() >= eventStartTime : false;
   const activeCategoryTitle = categories[currentCategoryIndex]?.title || "";
 
@@ -335,11 +371,28 @@ const Nominees = () => {
 
   if (isLoading) {
     return (
-      <div className="w-full max-w-[1760px] mx-auto px-[clamp(16px,3vw,48px)] py-16 flex flex-col items-center justify-center min-h-[60vh]">
-        <div className="w-12 h-12 border-4 border-[#FF641A] border-t-transparent rounded-full animate-spin mb-4" />
-        <p className="text-zinc-300 font-barlow font-bold uppercase tracking-[0.22em] text-sm">
-          Loading 2026 Nominees...
-        </p>
+      <div
+        aria-label="Loading 2026 Nominees"
+        className="w-full max-w-[1760px] mx-auto px-[clamp(16px,3vw,48px)] pb-6 sm:pb-6 animate-pulse"
+      >
+        <div className="w-full pt-4 sm:pt-5 pb-3 sm:pb-4 space-y-3">
+          <div className="flex justify-between">
+            <div className="h-3 w-40 bg-zinc-800" />
+            <div className="h-3 w-12 bg-zinc-800" />
+          </div>
+          <div className="h-[2px] w-full bg-zinc-800" />
+          <div className="h-10 sm:h-12 w-72 mx-auto bg-zinc-800/80" />
+          <div className="h-4 w-96 max-w-full mx-auto bg-zinc-800/60" />
+        </div>
+        <div className="w-full flex flex-wrap justify-center gap-3.5 sm:gap-5 2xl:gap-6 mt-2 sm:mt-3">
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <div
+              key={idx}
+              className="aspect-[2/3] bg-[#141416] border border-zinc-800/90 !w-[calc((100%-14px)/2)] sm:!w-[calc((100%-40px)/3)] xl:!w-[calc((100%-100px)/6)] 2xl:!w-[calc((100%-120px)/6)]"
+            />
+          ))}
+        </div>
+        <div className="mt-6 md:mt-5 h-16 bg-[#141416] border border-zinc-800/90" />
       </div>
     );
   }

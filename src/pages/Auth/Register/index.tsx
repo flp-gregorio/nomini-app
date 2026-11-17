@@ -63,6 +63,7 @@ const Register = () => {
         <InputComponent
           label="Username"
           type="text"
+          autoComplete="username"
           placeholder="Your Username"
           {...register("username")}
         />
@@ -70,6 +71,7 @@ const Register = () => {
         <InputComponent
           label="Email"
           type="email"
+          autoComplete="email"
           placeholder="Your Email"
           {...register("email")}
         />
@@ -77,6 +79,7 @@ const Register = () => {
         <InputComponent
           label="Password"
           type="password"
+          autoComplete="new-password"
           placeholder="Your Password"
           {...register("password")}
         />
@@ -84,6 +87,7 @@ const Register = () => {
         <InputComponent
           label="Confirm Password"
           type="password"
+          autoComplete="new-password"
           placeholder="Confirm Your Password"
           {...register("confirmPassword")}
         />

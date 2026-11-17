@@ -25,7 +25,7 @@ export interface EventConfigResponse {
   eventDate: string | null;
 }
 
-const DEFAULT_TTL_MS = 30_000;
+const DEFAULT_TTL_MS = 300_000;
 
 interface CacheEntry {
   value: unknown;
@@ -152,7 +152,7 @@ export const dataService = {
 
   getWinners: async (year?: number, force = false) => {
     const query = year ? `?year=${year}` : "";
-    return cachedGet<WinnersResponse>(
+    const result = await cachedGet<WinnersResponse>(
       `catalog:winners:${year ?? "latest"}`,
       async () => {
         const { data } = await api.get<WinnersResponse>(
@@ -162,6 +162,13 @@ export const dataService = {
       },
       { force }
     );
+    if (!year && result.year) {
+      cache.set(`catalog:winners:${result.year}`, {
+        value: result,
+        expiresAt: Date.now() + DEFAULT_TTL_MS,
+      });
+    }
+    return result;
   },
 
   getEvent: async (force = false) => {
