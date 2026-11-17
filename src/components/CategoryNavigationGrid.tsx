@@ -3,6 +3,7 @@ import { memo, useCallback, useRef, type KeyboardEvent } from "react";
 export type CategoryGridItem = {
   id?: number | string;
   title?: string;
+  hasVoted?: boolean;
 };
 
 type CategoryNavigationGridProps = {
@@ -11,7 +12,7 @@ type CategoryNavigationGridProps = {
   onSelectCategory: (index: number) => void;
 };
 
-/** Landscape layout, maximum 10 columns. 30 -> 10x3. */
+/** Landscape layout, maximum 10 columns. */
 function getGridColumns(total: number): number {
   if (total <= 0) return 1;
   return Math.min(10, total);
@@ -104,8 +105,9 @@ const CategoryNavigationGrid = memo(
                 category.title?.trim() || `Category ${index + 1}`;
 
               const isCurrent = index === currentIndex;
-              const isPast = index < currentIndex;
+              const isVoted = category.hasVoted === true;
 
+              // Center the final row when it is incomplete.
               const isInLastRow = remainder > 0 && index >= lastRowStart;
 
               const visualColumn = isInLastRow
@@ -128,7 +130,7 @@ const CategoryNavigationGrid = memo(
 
               const state = isCurrent
                 ? "bg-[#FF641A] shadow-[0_0_18px_3px_rgba(255,100,26,0.75)]"
-                : isPast
+                : isVoted
                 ? "bg-[#FF641A]/35 hover:bg-[#FF641A] hover:shadow-[0_0_12px_2px_rgba(255,100,26,0.55)]"
                 : "bg-white/15 hover:bg-[#FF641A] hover:shadow-[0_0_12px_2px_rgba(255,100,26,0.55)]";
 
@@ -138,7 +140,7 @@ const CategoryNavigationGrid = memo(
                   type="button"
                   onClick={() => onSelectCategory(index)}
                   aria-current={isCurrent ? "step" : undefined}
-                  aria-label={categoryTitle}
+                  aria-label={`${categoryTitle}${isVoted ? ", voted" : ", not voted"}`}
                   style={gridPlacement}
                   className={`group relative z-0 h-[10px] w-[10px] shrink-0 rounded-none border-0 p-0 outline-none transition-all duration-300 ease-out hover:z-10 hover:scale-125 motion-reduce:transition-none focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-[#FF641A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#09090B] ${state}`}
                 >
