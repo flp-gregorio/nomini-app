@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import api from "../../lib/api";
 import AdminArtworkManager from "../../components/AdminArtworkManager";
+import { useAuth } from "../../hooks/useAuth";
 
 type JsonNominee = {
     id: string;
@@ -15,11 +16,12 @@ type JsonCategory = {
 };
 
 const Admin = () => {
+    const { isAdmin, isLoading: isAuthLoading } = useAuth();
     const [categories, setCategories] = useState<JsonCategory[]>([]);
     const [activeTab, setActiveTab] = useState<"event" | "artwork">("event");
     const [message, setMessage] = useState("");
     const [isLoading, setIsLoading] = useState(true);
-    const [isAdmin, setIsAdmin] = useState<boolean | null>(null); // null = loading
+    const hasLoadedRef = useRef(false);
 
     // Event date state
     const [currentEventDate, setCurrentEventDate] = useState<string | null>(null);
@@ -28,24 +30,11 @@ const Admin = () => {
     const [isEventLoading, setIsEventLoading] = useState(false);
 
     useEffect(() => {
-        checkAdmin();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    const checkAdmin = async () => {
-        try {
-            const res = await api.get<{ username: string; email: string; admin: boolean }>("/auth/me");
-            if (res.data.admin) {
-                setIsAdmin(true);
-                fetchData();
-                fetchEventDate();
-            } else {
-                setIsAdmin(false);
-            }
-        } catch {
-            setIsAdmin(false);
-        }
-    };
+        if (isAuthLoading || !isAdmin || hasLoadedRef.current) return;
+        hasLoadedRef.current = true;
+        fetchData();
+        fetchEventDate();
+    }, [isAuthLoading, isAdmin]);
 
     const fetchEventDate = async () => {
         try {
@@ -122,9 +111,9 @@ const Admin = () => {
     };
 
     // Loading state
-    if (isAdmin === null) {
+    if (isAuthLoading) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-neutral-900">
+            <div className="flex items-center justify-center min-h-[65vh]">
                 <div className="text-white text-xl font-barlow animate-pulse">Checking access...</div>
             </div>
         );
@@ -133,7 +122,7 @@ const Admin = () => {
     // Not admin
     if (!isAdmin) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen bg-neutral-900 gap-4">
+            <div className="flex flex-col items-center justify-center min-h-[65vh] gap-4">
                 <h1 className="text-4xl font-bold text-red-500 font-barlow">Access Denied</h1>
                 <p className="text-zinc-400 font-barlow">You do not have admin privileges.</p>
             </div>
@@ -142,14 +131,14 @@ const Admin = () => {
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-neutral-900">
+            <div className="flex items-center justify-center min-h-[65vh]">
                 <div className="text-white text-xl font-barlow animate-pulse">Loading admin data...</div>
             </div>
         );
     }
 
     return (
-        <div className="flex flex-col items-center w-full min-h-screen bg-neutral-900 text-white px-4 sm:px-6 lg:px-8 py-6">
+        <div className="flex flex-col items-center w-full text-white px-4 sm:px-6 lg:px-8 py-6">
             <div className="w-[94%] max-w-[1800px] mx-auto">
                 <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-6 pb-4 border-b border-neutral-800">
                     <div>

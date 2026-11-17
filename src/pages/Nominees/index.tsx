@@ -186,19 +186,29 @@ const Nominees = () => {
   }, [handleNextCategory, handlePreviousCategory]);
 
   const isVotingClosed = eventStartTime ? new Date() >= eventStartTime : false;
+  const activeCategoryTitle = categories[currentCategoryIndex]?.title || "";
 
-  const handleSetActiveCard = (nominee: string) => {
-    if (!categories.length || isVotingClosed || isSubmitting) return;
-    const currentCategoryKey = categories[currentCategoryIndex].title || "";
-    setActiveNominees((prev) => ({
-      ...prev,
-      [currentCategoryKey]:
-        prev[currentCategoryKey] === nominee ? null : nominee,
-    }));
-    if (feedback?.type === "error") {
-      showFeedback(null);
-    }
-  };
+  const handleSetActiveCard = useCallback(
+    (nominee: string) => {
+      if (!activeCategoryTitle || isVotingClosed || isSubmitting) return;
+      setActiveNominees((prev) => ({
+        ...prev,
+        [activeCategoryTitle]:
+          prev[activeCategoryTitle] === nominee ? null : nominee,
+      }));
+      setFeedback((prev) => {
+        if (prev?.type === "error") {
+          if (feedbackTimerRef.current) {
+            window.clearTimeout(feedbackTimerRef.current);
+            feedbackTimerRef.current = null;
+          }
+          return null;
+        }
+        return prev;
+      });
+    },
+    [activeCategoryTitle, isVotingClosed, isSubmitting]
+  );
 
   const onSaveVote = async () => {
     if (isVotingClosed) {
@@ -288,7 +298,7 @@ const Nominees = () => {
 
   if (isLoading) {
     return (
-      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 py-16 flex flex-col items-center justify-center min-h-[60vh]">
+      <div className="w-full max-w-[1760px] mx-auto px-[clamp(16px,3vw,48px)] py-16 flex flex-col items-center justify-center min-h-[60vh]">
         <div className="w-12 h-12 border-4 border-[#FF641A] border-t-transparent rounded-full animate-spin mb-4" />
         <p className="text-zinc-300 font-barlow font-bold uppercase tracking-[0.22em] text-sm">
           Loading 2026 Nominees...
@@ -299,7 +309,7 @@ const Nominees = () => {
 
   if (categories.length === 0) {
     return (
-      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 py-20 text-center">
+      <div className="w-full max-w-[1760px] mx-auto px-[clamp(16px,3vw,48px)] py-20 text-center">
         <p className="text-zinc-400 font-barlow font-bold uppercase tracking-[0.22em]">
           No 2026 categories found.
         </p>
@@ -319,13 +329,6 @@ const Nominees = () => {
   );
   const isLastCategory = currentCategoryIndex === categories.length - 1;
 
-  const desktopGridCols =
-    cardsData.length <= 4
-      ? "lg:grid-cols-4 xl:grid-cols-4"
-      : cardsData.length === 5
-      ? "lg:grid-cols-3 xl:grid-cols-5"
-      : "lg:grid-cols-3 xl:grid-cols-6";
-
   const buttonLabel = isVotingClosed
     ? "Voting Closed"
     : isSubmitting
@@ -337,7 +340,7 @@ const Nominees = () => {
     : "Save Vote";
 
   return (
-    <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 pb-10 sm:pb-14">
+    <div className="w-full max-w-[1760px] mx-auto px-[clamp(16px,3vw,48px)] pb-6 sm:pb-6">
       <NavigationComponent
         onPrevious={handlePreviousCategory}
         onNext={handleNextCategory}
@@ -347,10 +350,10 @@ const Nominees = () => {
         totalCategories={categories.length}
       />
 
-      {/* Nominee Grid */}
+      {/* Centered Responsive Nominee Layout: 2 cols mobile, 3 cols tablet, 6 cols wide desktop */}
       <div
         key={currentCategoryKey}
-        className={`animate-category-enter w-full grid grid-cols-1 min-[360px]:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 ${desktopGridCols} gap-3.5 sm:gap-4 lg:gap-5 mt-2`}
+        className="animate-category-enter w-full flex flex-wrap justify-center gap-3.5 sm:gap-5 2xl:gap-6 mt-2 sm:mt-3"
       >
         {cardsData.map((nomineeData, index) => {
           const title = nomineeData.Nominee ?? nomineeData.name ?? "Unknown";
@@ -368,23 +371,28 @@ const Nominees = () => {
 
           return (
             <CardComponent
-              key={`${currentCategoryKey}-${index}`}
+              key={`${currentCategoryKey}-${nomineeData.id ?? title}-${index}`}
               nominee={title}
               aux={aux}
               genre={genre}
               background={background}
               loading={index < 6 ? "eager" : "lazy"}
+              priority={index < 6}
+              sizes="(min-width: 1280px) 16vw, (min-width: 640px) 31vw, 46vw"
+              width={nomineeData.artwork?.width}
+              height={nomineeData.artwork?.height}
               active={title === activeNominee}
               disabled={isVotingClosed || isSubmitting}
+              className="!w-[calc((100%-14px)/2)] sm:!w-[calc((100%-40px)/3)] xl:!w-[calc((100%-100px)/6)] 2xl:!w-[calc((100%-120px)/6)]"
               setActiveCard={handleSetActiveCard}
             />
           );
         })}
       </div>
 
-      {/* Connected Voting Action Bar (sticky on mobile, static below grid on md+) */}
-      <div className="sticky bottom-3 md:static z-20 mt-7 sm:mt-9">
-        <div className="bg-[#141416] border border-zinc-800/90 rounded-md px-4 sm:px-6 py-3.5 sm:py-4 shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-6">
+      {/* Connected Voting Action Bar (sticky on mobile below cards, static below grid on md+) */}
+      <div className="sticky bottom-3 md:static z-20 mt-6 md:mt-5">
+        <div className="bg-[#141416] border border-zinc-800/90 rounded-md px-4 sm:px-6 py-3 sm:py-3.5 shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-6">
           <div className="min-w-0 flex flex-col gap-1">
             {feedback && (
               <div

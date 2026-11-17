@@ -7,6 +7,7 @@ import InputComponent from "../../../components/InputComponent";
 import LayoutAuthComponent from "../../../components/Layouts/LayoutAuthComponent";
 import api from "../../../lib/api";
 import { AxiosError } from "axios";
+import { useAuth } from "../../../hooks/useAuth";
 
 interface IFormInput {
   username: string;
@@ -16,12 +17,14 @@ interface IFormInput {
 const Login = () => {
   const { register, handleSubmit } = useForm<IFormInput>();
   const nav = useNavigate();
+  const { refreshUser } = useAuth();
   const [error, setError] = useState<string | null>(null);
 
   const onSubmit = async (data: IFormInput) => {
     try {
       const response = await api.post("/auth/login", data);
       localStorage.setItem("jwt", response.data.token);
+      await refreshUser();
 
 
       try {

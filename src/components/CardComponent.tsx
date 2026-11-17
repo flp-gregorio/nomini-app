@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 
 interface CardComponentProps {
   nominee: string;
@@ -6,21 +6,31 @@ interface CardComponentProps {
   genre?: string;
   background?: string;
   loading?: "eager" | "lazy";
+  priority?: boolean;
+  sizes?: string;
+  width?: number | null;
+  height?: number | null;
   active: boolean;
   disabled?: boolean;
+  className?: string;
   setActiveCard: (nominee: string) => void;
 }
 
-const CardComponent: React.FC<CardComponentProps> = ({
+const CardComponent = memo(({
   nominee,
   aux = "",
   genre = "",
   background,
   loading = "lazy",
+  priority = false,
+  sizes,
+  width,
+  height,
   active,
   disabled = false,
+  className = "",
   setActiveCard,
-}) => {
+}: CardComponentProps) => {
   const [imageFailed, setImageFailed] = useState(false);
 
   useEffect(() => {
@@ -41,24 +51,29 @@ const CardComponent: React.FC<CardComponentProps> = ({
       disabled={disabled}
       aria-pressed={active}
       aria-label={`${nominee}${aux ? `, ${aux}` : ""}${active ? " (Selected)" : ""}`}
-      className={`group relative w-full aspect-[4/5] rounded-md overflow-hidden text-left bg-[#141416] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#09090B] ${
+      style={{ containerType: "inline-size" }}
+      className={`group relative w-full aspect-[2/3] rounded-md overflow-hidden text-left bg-[#141416] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#09090B] ${
         disabled ? "cursor-not-allowed opacity-80" : "cursor-pointer"
       } ${
         active
           ? "border-2 border-[#FF641A] shadow-[0_0_24px_rgba(255,100,26,0.22)]"
           : "border border-zinc-800/90 hover:border-zinc-500/80"
-      }`}
+      } ${className}`}
     >
       {/* Full-bleed Artwork or Restrained Editorial Fallback */}
       {hasArtwork ? (
         <img
           src={background}
           alt={nominee}
-          loading={loading}
+          loading={priority ? "eager" : loading}
           decoding="async"
+          sizes={sizes}
+          width={width ?? undefined}
+          height={height ?? undefined}
           referrerPolicy="no-referrer"
+          {...(priority ? { fetchpriority: "high" } : {})}
           onError={() => setImageFailed(true)}
-          className={`absolute inset-0 w-full h-full object-cover object-center transition-transform duration-300 ease-out ${
+          className={`absolute inset-0 w-full h-full object-cover object-top transition-transform duration-300 ease-out ${
             !disabled ? "group-hover:scale-105 group-hover:brightness-110" : ""
           } ${active ? "scale-[1.02]" : ""}`}
         />
@@ -72,7 +87,7 @@ const CardComponent: React.FC<CardComponentProps> = ({
           }}
         >
           <svg
-            className="w-12 h-12 text-zinc-700/60 mb-6"
+            className="w-12 h-12 text-zinc-700/60 mb-10"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 80 80"
             fill="currentColor"
@@ -86,14 +101,15 @@ const CardComponent: React.FC<CardComponentProps> = ({
         </div>
       )}
 
-      {/* Readability Gradient Overlay */}
+      {/* Strengthened Bottom Gradient Overlay for Readability */}
       <div
         aria-hidden="true"
-        className={`absolute inset-0 transition-opacity duration-200 ${
-          active
-            ? "bg-gradient-to-t from-[#09090B] via-[#09090B]/55 to-[#FF641A]/10"
-            : "bg-gradient-to-t from-[#09090B] via-[#09090B]/50 to-transparent"
-        }`}
+        className="absolute inset-0 transition-opacity duration-200"
+        style={{
+          background: active
+            ? "linear-gradient(to top, rgba(9, 9, 11, 0.97) 0%, rgba(9, 9, 11, 0.84) 36%, rgba(9, 9, 11, 0.28) 66%, rgba(255, 100, 26, 0.1) 100%)"
+            : "linear-gradient(to top, rgba(9, 9, 11, 0.97) 0%, rgba(9, 9, 11, 0.82) 34%, rgba(9, 9, 11, 0.25) 64%, transparent 100%)",
+        }}
       />
 
       {/* Top-Right Selection Indicator */}
@@ -102,14 +118,10 @@ const CardComponent: React.FC<CardComponentProps> = ({
         className={`absolute top-2.5 right-2.5 z-10 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-montserrat font-bold uppercase tracking-wider transition-all duration-200 ${
           active
             ? "bg-[#FF641A] text-white opacity-100 scale-100 shadow-lg"
-            : "bg-[#09090B]/70 text-zinc-400 border border-zinc-700/70 opacity-0 group-hover:opacity-100 scale-95 group-hover:scale-100"
+            : "bg-[#09090B]/75 text-zinc-300 border border-zinc-700/70 opacity-0 group-hover:opacity-100 scale-95 group-hover:scale-100"
         }`}
       >
-        <svg
-          className="w-3 h-3"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
+        <svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor">
           <path
             fillRule="evenodd"
             d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
@@ -122,15 +134,18 @@ const CardComponent: React.FC<CardComponentProps> = ({
       {/* Bottom Title & Metadata */}
       <div className="relative z-10 h-full w-full p-3.5 sm:p-4 flex flex-col justify-end">
         {genre && (
-          <span className="text-[10px] font-montserrat font-semibold uppercase tracking-[0.16em] text-zinc-400 mb-1 truncate">
+          <span className="text-[10px] font-montserrat font-semibold uppercase tracking-[0.16em] text-zinc-300/90 mb-1 truncate">
             {genre}
           </span>
         )}
-        <h2 className="font-barlow font-bold uppercase tracking-tight text-[#F5F5F5] text-base sm:text-lg leading-tight line-clamp-2 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+        <h2
+          style={{ fontSize: "clamp(0.875rem, 7cqw, 1.25rem)" }}
+          className="font-barlow font-bold uppercase tracking-tight text-[#F5F5F5] leading-[1.12] line-clamp-3 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]"
+        >
           {nominee}
         </h2>
         {aux && aux !== "NULL" && (
-          <p className="mt-1 font-barlow text-xs font-medium text-zinc-400 truncate">
+          <p className="mt-1 font-barlow text-xs font-medium text-zinc-300/85 truncate">
             {aux}
           </p>
         )}
@@ -145,6 +160,8 @@ const CardComponent: React.FC<CardComponentProps> = ({
       )}
     </button>
   );
-};
+});
+
+CardComponent.displayName = "CardComponent";
 
 export default CardComponent;

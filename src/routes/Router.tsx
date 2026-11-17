@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import PageTitleComponent from "../components/PageTitleComponent";
 import About from "../pages/About";
@@ -9,9 +10,9 @@ import Nominees from "../pages/Nominees";
 import NotFound from "../pages/NotFound";
 import Profile from "../pages/Profile";
 import Winners from "../pages/Winners";
-import Admin from "../pages/Admin";
 import RequireAuth from "../components/RequireAuth.tsx";
 import LayoutSystemComponent from "../components/Layouts/LayoutSystemComponent";
+import LazyAdmin from "./LazyAdmin";
 
 const router = createBrowserRouter([
   // GROUP 1: Standalone Pages
@@ -39,15 +40,6 @@ const router = createBrowserRouter([
       <>
         <Register />
         <PageTitleComponent title="Nomini - Register" />
-      </>
-    ),
-  },
-  {
-    path: "admin",
-    element: (
-      <>
-        <Admin />
-        <PageTitleComponent title="Nomini - Admin (TGA 2026)" />
       </>
     ),
   },
@@ -104,6 +96,25 @@ const router = createBrowserRouter([
               <Leaderboard />
               <PageTitleComponent title="Nomini - Leaderboard (TGA 2026)" />
             </>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: "admin",
+        element: (
+          <RequireAuth>
+            <Suspense
+              fallback={
+                <div className="flex items-center justify-center min-h-[65vh]">
+                  <div className="text-zinc-300 text-lg font-barlow uppercase tracking-widest animate-pulse">
+                    Loading admin panel...
+                  </div>
+                </div>
+              }
+            >
+              <LazyAdmin />
+              <PageTitleComponent title="Nomini - Admin (TGA 2026)" />
+            </Suspense>
           </RequireAuth>
         ),
       },

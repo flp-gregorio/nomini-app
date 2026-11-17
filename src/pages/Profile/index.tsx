@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import ButtonComponent from "../../components/ButtonComponent";
 import InputComponent from "../../components/InputComponent";
+import { useAuth } from "../../hooks/useAuth";
 import api from "../../lib/api";
 
 interface IFormInput {
@@ -19,20 +20,9 @@ const Profile = () => {
     formState: { errors },
   } = useForm<IFormInput>();
 
-  const [username, setUsername] = useState<string>("");
+  const { user } = useAuth();
+  const username = user?.username ?? "";
   const [successMessage, setSuccessMessage] = useState<string>("");
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const { data } = await api.get("/auth/me");
-        setUsername(data.username);
-      } catch (error) {
-        console.error("Error fetching user:", error);
-      }
-    };
-    fetchUser();
-  }, []);
 
   const onSubmit = async (data: IFormInput) => {
     setSuccessMessage("");

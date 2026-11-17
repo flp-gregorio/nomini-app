@@ -1,21 +1,57 @@
-import { useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
+import { useIsAdmin } from "../hooks/useAuth";
+import { prefetchAdminPage } from "../routes/adminLoader";
 
 const navItemsLeft = [
   { to: "/nominees", label: "NOMINEES" },
   { to: "/winners", label: "WINNERS" },
 ];
 
-const HeaderComponent = () => {
+const HeaderComponent = memo(() => {
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
+  const isAdmin = useIsAdmin();
 
   const isProfileActive = location.pathname.startsWith("/profile");
 
   useEffect(() => {
     setProfileOpen(false);
   }, [location.pathname]);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    if (typeof window.requestIdleCallback === "function") {
+      const idleId = window.requestIdleCallback(() => {
+        void prefetchAdminPage();
+      });
+      return () => window.cancelIdleCallback(idleId);
+    }
+
+    const timerId = window.setTimeout(() => {
+      void prefetchAdminPage();
+    }, 1000);
+    return () => window.clearTimeout(timerId);
+  }, [isAdmin]);
+
+  const handlePrefetchAdmin = useCallback(() => {
+    if (isAdmin) {
+      void prefetchAdminPage();
+    }
+  }, [isAdmin]);
+
+  const mobileNavItems = useMemo(
+    () => [
+      { to: "/nominees", label: "NOMINEES" },
+      { to: "/winners", label: "WINNERS" },
+      { to: "/leaderboard", label: "LEADERBOARD" },
+      ...(isAdmin ? [{ to: "/admin", label: "ADMIN" }] : []),
+      { to: "/profile", label: "PROFILE" },
+    ],
+    [isAdmin]
+  );
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -47,7 +83,7 @@ const HeaderComponent = () => {
   };
 
   const navLinkClass = (isActive: boolean) =>
-    `relative py-2 text-xs md:text-sm font-montserrat font-bold uppercase tracking-[0.18em] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#09090B] rounded-sm ${
+    `relative whitespace-nowrap py-2 text-xs lg:text-sm font-montserrat font-bold uppercase tracking-[0.12em] lg:tracking-[0.18em] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#09090B] rounded-sm ${
       isActive
         ? "text-[#F5F5F5]"
         : "text-zinc-400 hover:text-[#F5F5F5]"
@@ -63,14 +99,14 @@ const HeaderComponent = () => {
 
   return (
     <header className="antialiased bg-[#09090B] border-b border-zinc-800/80 w-full z-40">
-      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10">
+      <div className="w-full max-w-[1760px] mx-auto px-[clamp(16px,3vw,48px)]">
         {/* Desktop Header */}
         <nav
           aria-label="Primary Navigation"
-          className="hidden md:grid md:grid-cols-[1fr_auto_1fr] items-center h-20"
+          className="hidden md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center h-16"
         >
           {/* Left Links */}
-          <div className="flex items-center justify-start gap-8 lg:gap-10">
+          <div className="flex items-center justify-start gap-4 lg:gap-8 xl:gap-10 min-w-0">
             {navItemsLeft.map((item) => (
               <NavLink
                 key={item.to}
@@ -93,7 +129,7 @@ const HeaderComponent = () => {
           <Link
             to="/"
             aria-label="Nomini — The Game Awards 2026 Home"
-            className="group relative flex items-center justify-center px-5 py-1.5 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A]"
+            className="group relative flex items-center justify-center px-2.5 lg:px-5 py-1.5 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A]"
           >
             <span
               aria-hidden="true"
@@ -117,7 +153,7 @@ const HeaderComponent = () => {
           </Link>
 
           {/* Right Links */}
-          <div className="flex items-center justify-end gap-8 lg:gap-10">
+          <div className="flex items-center justify-end gap-4 lg:gap-8 xl:gap-10 min-w-0">
             <NavLink
               to="/leaderboard"
               className={({ isActive }) => navLinkClass(isActive)}
@@ -131,6 +167,24 @@ const HeaderComponent = () => {
                 </>
               )}
             </NavLink>
+
+            {isAdmin && (
+              <NavLink
+                to="/admin"
+                onMouseEnter={handlePrefetchAdmin}
+                onFocus={handlePrefetchAdmin}
+                className={({ isActive }) => navLinkClass(isActive)}
+              >
+                {({ isActive }) => (
+                  <>
+                    <span className={isActive ? "text-[#FF641A]" : ""}>
+                      ADMIN
+                    </span>
+                    {activeBar(isActive)}
+                  </>
+                )}
+              </NavLink>
+            )}
 
             {/* Profile with dropdown */}
             <div
@@ -228,17 +282,14 @@ const HeaderComponent = () => {
             </Link>
           </div>
           <div className="border-t border-zinc-800/70 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 py-2">
-            {[
-              { to: "/nominees", label: "NOMINEES" },
-              { to: "/winners", label: "WINNERS" },
-              { to: "/leaderboard", label: "LEADERBOARD" },
-              { to: "/profile", label: "PROFILE" },
-            ].map((item) => (
+            {mobileNavItems.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
+                onMouseEnter={item.to === "/admin" ? handlePrefetchAdmin : undefined}
+                onFocus={item.to === "/admin" ? handlePrefetchAdmin : undefined}
                 className={({ isActive }) =>
-                  `relative py-1.5 text-[11px] sm:text-xs font-montserrat font-bold uppercase tracking-[0.12em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A] rounded-sm ${
+                  `relative whitespace-nowrap py-1.5 text-[11px] sm:text-xs font-montserrat font-bold uppercase tracking-[0.12em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A] rounded-sm ${
                     isActive
                       ? "text-[#FF641A]"
                       : "text-zinc-400 hover:text-[#F5F5F5]"
@@ -258,6 +309,8 @@ const HeaderComponent = () => {
       </div>
     </header>
   );
-};
+});
+
+HeaderComponent.displayName = "HeaderComponent";
 
 export default HeaderComponent;

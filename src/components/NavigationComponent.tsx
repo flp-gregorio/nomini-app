@@ -26,10 +26,10 @@ const NavigationComponent = ({
   return (
     <section
       aria-label="Category Header"
-      className="w-full pt-6 sm:pt-8 pb-5 sm:pb-7"
+      className="w-full pt-4 sm:pt-5 pb-3 sm:pb-4"
     >
       {/* Top Meta Bar: Event Label & Category Counter */}
-      <div className="flex items-center justify-between gap-4 mb-3">
+      <div className="flex items-center justify-between gap-4 mb-2">
         <span className="text-[#FF641A] text-[11px] sm:text-xs font-bold font-montserrat uppercase tracking-[0.26em]">
           The Game Awards 2026
         </span>
@@ -58,18 +58,18 @@ const NavigationComponent = ({
       </div>
 
       {/* Category Title + Prev / Next Controls */}
-      <div className="flex items-center justify-between gap-3 sm:gap-6 mt-6 sm:mt-8">
+      <div className="flex items-center justify-between gap-3 sm:gap-6 mt-3.5 sm:mt-4">
         <button
           type="button"
           onClick={onPrevious}
           aria-label="Previous category"
           title="Previous category (Left Arrow)"
-          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-zinc-800 bg-[#141416] text-zinc-300 hover:border-[#FF641A] hover:text-[#FF641A] hover:bg-[#FF641A]/10 active:scale-95 transition-all duration-200 flex items-center justify-center shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A]"
+          className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-zinc-800 bg-[#141416] text-zinc-300 hover:border-[#FF641A] hover:text-[#FF641A] hover:bg-[#FF641A]/10 active:scale-95 transition-all duration-200 flex items-center justify-center shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A]"
         >
           <FaArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" aria-hidden="true" />
         </button>
 
-        <h1 className="flex-1 min-w-0 text-center text-3xl sm:text-5xl lg:text-6xl font-black font-barlow uppercase tracking-tight leading-[0.98] text-[#FF641A] break-words">
+        <h1 className="flex-1 min-w-0 text-center text-3xl sm:text-4xl lg:text-[3.25rem] font-black font-barlow uppercase tracking-tight leading-[0.95] text-[#FF641A] break-words">
           {headerText}
         </h1>
 
@@ -78,7 +78,7 @@ const NavigationComponent = ({
           onClick={onNext}
           aria-label="Next category"
           title="Next category (Right Arrow)"
-          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-zinc-800 bg-[#141416] text-zinc-300 hover:border-[#FF641A] hover:text-[#FF641A] hover:bg-[#FF641A]/10 active:scale-95 transition-all duration-200 flex items-center justify-center shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A]"
+          className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-zinc-800 bg-[#141416] text-zinc-300 hover:border-[#FF641A] hover:text-[#FF641A] hover:bg-[#FF641A]/10 active:scale-95 transition-all duration-200 flex items-center justify-center shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A]"
         >
           <FaArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" aria-hidden="true" />
         </button>
@@ -86,7 +86,7 @@ const NavigationComponent = ({
 
       {/* Category Description */}
       {description && (
-        <p className="mt-3 sm:mt-4 text-zinc-400 font-barlow text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl text-center mx-auto">
+        <p className="mt-2 sm:mt-2.5 text-zinc-400 font-barlow text-sm sm:text-base leading-snug max-w-2xl text-center mx-auto">
           {description}
         </p>
       )}
