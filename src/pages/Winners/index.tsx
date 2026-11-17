@@ -90,37 +90,37 @@ const Winners = () => {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-4xl md:text-6xl font-black text-white font-barlow uppercase tracking-tighter">
-          And the <span className="text-orange-500">Winners</span> are...
-        </h1>
-      </div>
-
-      {/* Year Selector */}
-      {years.length > 0 && (
-        <div className="flex justify-center gap-3 mb-10">
-          {years.map((year) => (
-            <button
-              key={year}
-              onClick={() => setSelectedYear(year)}
-              className={`px-5 py-2 rounded-full font-barlow font-bold text-sm uppercase tracking-wider transition-all duration-300 ${
-                selectedYear === year
-                  ? "bg-orange-600 text-white shadow-lg shadow-orange-600/30"
-                  : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white"
-              }`}
-            >
-              {year}
-            </button>
-          ))}
+    <div className="w-[94%] max-w-[1800px] mx-auto px-2 sm:px-4 py-6">
+      {/* Header & Year Selector */}
+      <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-6 pb-4 border-b border-zinc-800/80">
+        <div className="text-center lg:text-left">
+          <h1 className="text-4xl md:text-5xl font-black text-white font-barlow uppercase tracking-tighter">
+            And the <span className="text-orange-500">Winners</span> are...
+          </h1>
+          <p className="text-zinc-400 font-barlow text-base md:text-lg mt-1">
+            Official results from The Game Awards {selectedYear ?? 2026}
+          </p>
         </div>
-      )}
 
-      {/* Subtitle */}
-      <p className="text-zinc-400 text-center mb-8 font-barlow text-lg">
-        Official results from The Game Awards {selectedYear ?? 2026}
-      </p>
+        {/* Year Selector */}
+        {years.length > 0 && (
+          <div className="flex justify-center lg:justify-end gap-3 flex-wrap">
+            {years.map((year) => (
+              <button
+                key={year}
+                onClick={() => setSelectedYear(year)}
+                className={`px-5 py-2 rounded-full font-barlow font-bold text-sm uppercase tracking-wider transition-all duration-300 ${
+                  selectedYear === year
+                    ? "bg-orange-600 text-white shadow-lg shadow-orange-600/30"
+                    : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white"
+                }`}
+              >
+                {year}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
 
       {isLoading ? (
         <div className="flex flex-col items-center justify-center min-h-[40vh]">
@@ -130,7 +130,7 @@ const Winners = () => {
           </h2>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 lg:gap-6">
           {winnersData.map((item) => (
             <div
               key={item.category.id}

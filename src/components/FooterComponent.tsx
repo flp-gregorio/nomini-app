@@ -1,7 +1,7 @@
 const FooterComponent = () => {
   return (
-    <footer className="bg-zinc-900 text-gray-600 body-font font-barlow w-full max-h-12 antialiased">
-      <div className="container py-2 flex justify-evenly mx-auto">
+    <footer className="bg-zinc-900 text-gray-600 body-font font-barlow w-full antialiased border-t border-zinc-800/60">
+      <div className="w-[94%] max-w-[1800px] py-2.5 px-2 sm:px-4 flex justify-between items-center mx-auto">
         <span className="mr-auto pl-3">
           <a href="/about" className="text-sm text-gray-500">
             About

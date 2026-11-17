@@ -196,16 +196,22 @@ const Nominees = () => {
   const currentCategoryKey = currentCategory.title || "Unknown Category";
 
   const cardsData = currentCategory.nominees ?? [];
-  const numCards = cardsData.length ? Math.min(cardsData.length, 6) : 0;
 
   const activeNominee = activeNominees[currentCategoryKey] || null;
 
   const isLastCategory = currentCategoryIndex === categories.length - 1;
   const isVotingClosed = eventStartTime ? new Date() >= eventStartTime : false;
 
+  const desktopGridCols =
+    cardsData.length <= 4
+      ? "xl:grid-cols-4"
+      : cardsData.length === 5
+      ? "xl:grid-cols-5"
+      : "xl:grid-cols-6";
+
   return (
-    <div className="flex flex-col items-center w-full">
-      <div className="mt-4 text-center">
+    <div className="flex flex-col items-center w-[94%] max-w-[1800px] mx-auto px-2 sm:px-4 pb-8">
+      <div className="mt-3 text-center">
         <span className="text-orange-500 text-xs font-bold font-montserrat uppercase tracking-[0.3em]">
           The Game Awards 2026 • Official Nominations ({currentCategoryIndex + 1}/{categories.length})
         </span>
@@ -215,70 +221,26 @@ const Nominees = () => {
         onNext={handleNextCategory}
         headerText={currentCategoryKey}
       />
-      <p className="my-4 text-neutral-50 font-barlow tracking-wider md:max-w-2xl text-center mx-2 min-h-[48px]">
+      <p className="my-2 md:my-3 text-neutral-50 font-barlow tracking-wider max-w-3xl text-center mx-2 min-h-[32px]">
         {currentCategory.description}
       </p>
 
-      <div className="hidden md:flex flex-col">
-        <div className="grid gap-6 grid-cols-3 grid-rows-1">
-          {cardsData.slice(0, 3).map((nomineeData, index) => {
-            const title =
-              nomineeData.Nominee ?? nomineeData.name ?? "Unknown";
-            const aux = nomineeData.Publisher ?? nomineeData.publisher ?? nomineeData.developer ?? "";
-            const genre = nomineeData.Genre ?? nomineeData.genre ?? "";
-            const background = nomineeData.Image ?? nomineeData.image ?? "";
-
-            return (
-              <CardComponent
-                key={`${currentCategoryKey}-top-${index}`}
-                nominee={title}
-                aux={aux}
-                genre={genre}
-                background={background}
-                active={title === activeNominee}
-                setActiveCard={handleSetActiveCard}
-              />
-            );
-          })}
-        </div>
-
-        <div className="col-span-3 flex justify-center mt-6 flex-row">
-          <div
-            className={`grid gap-6 ${numCards % 3 === 0 ? "grid-cols-3" : "grid-cols-2"
-              } grid-rows-1`}
-          >
-            {cardsData.slice(3, numCards).map((nomineeData, index) => {
-              const title =
-                nomineeData.Nominee ?? nomineeData.name ?? "Unknown";
-              const aux =
-                nomineeData.Publisher ?? nomineeData.publisher ?? nomineeData.developer ?? "";
-              const genre = nomineeData.Genre ?? nomineeData.genre ?? "";
-              const background = nomineeData.Image ?? nomineeData.image ?? "";
-              return (
-                <CardComponent
-                  key={`${currentCategoryKey}-bottom-${index}`}
-                  nominee={title}
-                  aux={aux}
-                  genre={genre}
-                  background={background}
-                  active={title === activeNominee}
-                  setActiveCard={handleSetActiveCard}
-                />
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      <div className="md:hidden grid gap-6 grid-cols-1 pb-12">
+      <div
+        className={`w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 ${desktopGridCols} gap-4 lg:gap-5 mt-4 pb-6`}
+      >
         {cardsData.map((nomineeData, index) => {
           const title = nomineeData.Nominee ?? nomineeData.name ?? "Unknown";
-          const aux = nomineeData.Publisher ?? nomineeData.publisher ?? nomineeData.developer ?? "";
+          const aux =
+            nomineeData.Publisher ??
+            nomineeData.publisher ??
+            nomineeData.developer ??
+            "";
           const genre = nomineeData.Genre ?? nomineeData.genre ?? "";
           const background = nomineeData.Image ?? nomineeData.image ?? "";
+
           return (
             <CardComponent
-              key={`${currentCategoryKey}-mobile-${index}`}
+              key={`${currentCategoryKey}-${index}`}
               nominee={title}
               aux={aux}
               genre={genre}
@@ -289,7 +251,8 @@ const Nominees = () => {
           );
         })}
       </div>
-      <div className={isLastCategory || isVotingClosed ? "hidden" : "pt-4"}>
+
+      <div className={isLastCategory || isVotingClosed ? "hidden" : "pt-2"}>
         <ButtonComponent
           text={isVotingClosed ? "Voting Closed" : "Save Vote"}
           onClick={onSaveVote}

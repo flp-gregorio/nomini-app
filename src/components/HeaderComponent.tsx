@@ -5,19 +5,19 @@ const HeaderComponent = () => {
   const [profileOpen, setProfileOpen] = useState(false);
 
   return (
-    <header className="text-gray-600 antialiased bg-zinc-900 font-montserrat font-bold text-xl md:text-1xl w-full tracking-tight">
-      <div className="container mx-auto flex items-center justify-between px-5">
-        <nav className="md:flex md:items-center mx-auto grid grid-cols-1 w-full md:max-w-screen-lg sm:w-full">
-          <div className="flex justify-between md:flex-row md:order-1 order-2 md:w-2/5 md:text-right">
+    <header className="text-gray-600 antialiased bg-zinc-900 font-montserrat font-bold text-lg lg:text-xl w-full tracking-tight border-b border-zinc-800/60">
+      <div className="w-[94%] max-w-[1800px] mx-auto flex items-center justify-between px-2 sm:px-4">
+        <nav className="md:flex md:items-center mx-auto grid grid-cols-1 w-full">
+          <div className="flex justify-between md:justify-start md:flex-row md:order-1 order-2 md:w-2/5 md:gap-8">
             <Link
               to="/nominees"
-              className="md:mx-5 mr-5 text-white hover:text-orange-600 transition-all duration-500"
+              className="text-white hover:text-orange-600 transition-all duration-500"
             >
               NOMINEES
             </Link>
             <Link
               to="/winners"
-              className="md:mx-5 text-white hover:text-orange-600 transition-all duration-500"
+              className="text-white hover:text-orange-600 transition-all duration-500"
             >
               WINNERS
             </Link>
@@ -40,16 +40,16 @@ const HeaderComponent = () => {
               />
             </svg>
           </Link>
-          <div className="flex justify-between md:flex-row md:order-3 order-3 md:w-2/5 md:text-left">
+          <div className="flex justify-between md:justify-end md:flex-row md:order-3 order-3 md:w-2/5 md:gap-8">
             <Link
               to="/leaderboard"
-              className="md:mx-5 mr-5 text-white hover:text-orange-600 transition-all duration-500"
+              className="text-white hover:text-orange-600 transition-all duration-500"
             >
               LEADERBOARD
             </Link>
             {/* Profile with dropdown */}
             <div
-              className="relative md:mx-5"
+              className="relative"
               onMouseEnter={() => setProfileOpen(true)}
               onMouseLeave={() => setProfileOpen(false)}
             >
