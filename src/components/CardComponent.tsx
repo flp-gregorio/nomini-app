@@ -5,6 +5,7 @@ interface CardComponentProps {
   aux?: string;
   genre?: string;
   background?: string;
+  loading?: "eager" | "lazy";
   active: boolean;
   disabled?: boolean;
   setActiveCard: (nominee: string) => void;
@@ -15,6 +16,7 @@ const CardComponent: React.FC<CardComponentProps> = ({
   aux = "",
   genre = "",
   background,
+  loading = "lazy",
   active,
   disabled = false,
   setActiveCard,
@@ -52,7 +54,9 @@ const CardComponent: React.FC<CardComponentProps> = ({
         <img
           src={background}
           alt={nominee}
-          loading="lazy"
+          loading={loading}
+          decoding="async"
+          referrerPolicy="no-referrer"
           onError={() => setImageFailed(true)}
           className={`absolute inset-0 w-full h-full object-cover object-center transition-transform duration-300 ease-out ${
             !disabled ? "group-hover:scale-105 group-hover:brightness-110" : ""

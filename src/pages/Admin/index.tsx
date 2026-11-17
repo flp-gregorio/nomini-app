@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../../lib/api";
+import AdminArtworkManager from "../../components/AdminArtworkManager";
 
 type JsonNominee = {
     id: string;
@@ -15,6 +16,7 @@ type JsonCategory = {
 
 const Admin = () => {
     const [categories, setCategories] = useState<JsonCategory[]>([]);
+    const [activeTab, setActiveTab] = useState<"event" | "artwork">("event");
     const [message, setMessage] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [isAdmin, setIsAdmin] = useState<boolean | null>(null); // null = loading
@@ -149,7 +151,7 @@ const Admin = () => {
     return (
         <div className="flex flex-col items-center w-full min-h-screen bg-neutral-900 text-white px-4 sm:px-6 lg:px-8 py-6">
             <div className="w-[94%] max-w-[1800px] mx-auto">
-                <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-2 mb-6 pb-4 border-b border-neutral-800">
+                <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-6 pb-4 border-b border-neutral-800">
                     <div>
                         <h1 className="text-3xl sm:text-4xl font-bold font-cinzel text-yellow-500">
                             Admin Panel
@@ -158,7 +160,37 @@ const Admin = () => {
                             The Game Awards 2026 • December 10, 2026 • Peacock Theater, Los Angeles
                         </p>
                     </div>
+
+                    <div className="flex gap-2">
+                        <button
+                            type="button"
+                            onClick={() => setActiveTab("event")}
+                            className={`px-4 py-2 rounded font-barlow font-bold text-sm uppercase tracking-wider transition-colors ${
+                                activeTab === "event"
+                                    ? "bg-yellow-600 text-white"
+                                    : "bg-neutral-800 text-neutral-400 hover:text-white"
+                            }`}
+                        >
+                            Event &amp; Winners
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setActiveTab("artwork")}
+                            className={`px-4 py-2 rounded font-barlow font-bold text-sm uppercase tracking-wider transition-colors ${
+                                activeTab === "artwork"
+                                    ? "bg-orange-600 text-white"
+                                    : "bg-neutral-800 text-neutral-400 hover:text-white"
+                            }`}
+                        >
+                            Artwork Manager
+                        </button>
+                    </div>
                 </div>
+
+                {activeTab === "artwork" ? (
+                    <AdminArtworkManager />
+                ) : (
+                <>
 
                 {/* Winner feedback message */}
                 {message && (
@@ -251,6 +283,8 @@ const Admin = () => {
                         </div>
                     ))}
                 </div>
+                </>
+                )}
             </div>
         </div>
     );

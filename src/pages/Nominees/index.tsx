@@ -5,6 +5,8 @@ import NavigationComponent from "../../components/NavigationComponent";
 import ButtonComponent from "../../components/ButtonComponent";
 import api from "../../lib/api";
 
+import { NomineeArtwork } from "../../@types/NomineeType";
+
 // Types
 type JsonNominee = {
   Nominee?: string;
@@ -17,6 +19,7 @@ type JsonNominee = {
   developer?: string;
   publisher?: string;
   image?: string;
+  artwork?: NomineeArtwork | null;
   genre?: string;
   description?: string;
   id?: string | number;
@@ -357,7 +360,11 @@ const Nominees = () => {
             nomineeData.developer ??
             "";
           const genre = nomineeData.Genre ?? nomineeData.genre ?? "";
-          const background = nomineeData.Image ?? nomineeData.image ?? "";
+          const background =
+            nomineeData.artwork?.imageUrl ??
+            nomineeData.Image ??
+            nomineeData.image ??
+            "";
 
           return (
             <CardComponent
@@ -366,6 +373,7 @@ const Nominees = () => {
               aux={aux}
               genre={genre}
               background={background}
+              loading={index < 6 ? "eager" : "lazy"}
               active={title === activeNominee}
               disabled={isVotingClosed || isSubmitting}
               setActiveCard={handleSetActiveCard}

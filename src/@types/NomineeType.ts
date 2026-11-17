@@ -28,12 +28,23 @@ export type Category = {
 // Nominees
 // Sourced from API (reading data.json)
 // ----------------------------------------------------------------------
+export type NomineeArtwork = {
+  provider: string;
+  providerGameId?: number | null;
+  imageId?: number | null;
+  imageUrl: string;
+  type: string;
+  width?: number | null;
+  height?: number | null;
+};
+
 export type Nominee = {
   id: number;          // Generated index
   name: string;        // Mapped from "Nominee" in JSON
   publisher: string;   // Mapped from "Publisher" in JSON
   genre: string;       // Mapped from "Genre" in JSON
   image: string;       // Mapped from "Image" in JSON
+  artwork?: NomineeArtwork | null;
   description?: string; // Optional (Not all nominees have one)
   
   // Winner Status (from data.json)
