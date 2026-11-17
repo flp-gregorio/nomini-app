@@ -1,25 +1,33 @@
+import { Link } from "react-router-dom";
+
 const FooterComponent = () => {
   return (
-    <footer className="bg-zinc-900 text-gray-600 body-font font-barlow w-full antialiased border-t border-zinc-800/60">
-      <div className="w-[94%] max-w-[1800px] py-2.5 px-2 sm:px-4 flex justify-between items-center mx-auto">
-        <span className="mr-auto pl-3">
-          <a href="/about" className="text-sm text-gray-500">
+    <footer className="bg-[#09090B] text-zinc-500 body-font font-barlow w-full antialiased border-t border-zinc-800/80">
+      <div className="w-full max-w-[1440px] py-4 px-4 sm:px-6 lg:px-10 flex flex-col sm:flex-row justify-between items-center gap-3 mx-auto">
+        <div className="flex items-center gap-6">
+          <Link
+            to="/about"
+            className="text-sm text-zinc-400 hover:text-[#F5F5F5] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A] rounded-sm"
+          >
             About
-          </a>
-        </span>
-        <span className="inline-flex items-center pr-2">
-          <span className="text-sm text-gray-500 pr-3 ml-auto">© 2026 Felipe Gregorio</span>
+          </Link>
+        </div>
+
+        <div className="inline-flex items-center gap-4">
+          <span className="text-sm text-zinc-500">© 2026 Felipe Gregorio</span>
           <a
             href="https://www.instagram.com/felipe.gregoriooo/"
-            target="_blank" 
+            target="_blank"
             rel="noopener noreferrer"
-            className="ml-3 text-gray-500 hover:text-rose-400 transition-all duration-500"
+            aria-label="Instagram"
+            className="text-zinc-500 hover:text-[#F5F5F5] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A] rounded-sm p-1"
           >
             <svg
               fill="none"
               stroke="currentColor"
               className="w-4 h-4"
               viewBox="0 0 24 24"
+              aria-hidden="true"
             >
               <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
               <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37zm1.5-4.87h.01"></path>
@@ -27,15 +35,17 @@ const FooterComponent = () => {
           </a>
           <a
             href="https://www.linkedin.com/in/felipe-gregorio-85bb4b1a2/"
-            target="_blank" 
+            target="_blank"
             rel="noopener noreferrer"
-            className="ml-3 text-gray-500 hover:text-blue-300 transition-all duration-500"
+            aria-label="LinkedIn"
+            className="text-zinc-500 hover:text-[#F5F5F5] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A] rounded-sm p-1"
           >
             <svg
               fill="currentColor"
               stroke="currentColor"
               className="w-4 h-4"
               viewBox="0 0 24 24"
+              aria-hidden="true"
             >
               <path
                 stroke="none"
@@ -44,7 +54,7 @@ const FooterComponent = () => {
               <circle cx="4" cy="4" r="2" stroke="none"></circle>
             </svg>
           </a>
-        </span>
+        </div>
       </div>
     </footer>
   );

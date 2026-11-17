@@ -1,11 +1,9 @@
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { AxiosError } from "axios";
 import CardComponent from "../../components/CardComponent";
 import NavigationComponent from "../../components/NavigationComponent";
 import ButtonComponent from "../../components/ButtonComponent";
 import api from "../../lib/api";
-import { AxiosError } from "axios";
-
-// Event start time is now fetched dynamically
 
 // Types
 type JsonNominee = {
@@ -37,16 +35,52 @@ type UserVote = {
   nominee: string;
 };
 
+type FeedbackState = {
+  type: "success" | "error";
+  message: string;
+} | null;
+
 const Nominees = () => {
   const [categories, setCategories] = useState<JsonCategory[]>([]);
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [eventStartTime, setEventStartTime] = useState<Date | null>(null);
+  const [feedback, setFeedback] = useState<FeedbackState>(null);
 
   const [activeNominees, setActiveNominees] = useState<
     Record<string, string | null>
   >({});
+  const [savedNominees, setSavedNominees] = useState<Record<string, string>>(
+    {}
+  );
   const [voteIds, setVoteIds] = useState<Record<string, number>>({});
+
+  const feedbackTimerRef = useRef<number | null>(null);
+
+  const showFeedback = useCallback(
+    (nextFeedback: FeedbackState, autoClearMs?: number) => {
+      if (feedbackTimerRef.current) {
+        window.clearTimeout(feedbackTimerRef.current);
+        feedbackTimerRef.current = null;
+      }
+      setFeedback(nextFeedback);
+      if (nextFeedback && autoClearMs) {
+        feedbackTimerRef.current = window.setTimeout(() => {
+          setFeedback(null);
+        }, autoClearMs);
+      }
+    },
+    []
+  );
+
+  useEffect(() => {
+    return () => {
+      if (feedbackTimerRef.current) {
+        window.clearTimeout(feedbackTimerRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,15 +90,21 @@ const Nominees = () => {
         const categoriesRes = await api.get<JsonCategory[]>("/categories");
         const fetchedCategories = categoriesRes.data;
 
-        const categoriesWithNominees = await Promise.all(fetchedCategories.map(async (cat) => {
-          const nomineesRes = await api.get<JsonNominee[]>(`/categories/${cat.id}/nominees`);
-          return { ...cat, nominees: nomineesRes.data };
-        }));
+        const categoriesWithNominees = await Promise.all(
+          fetchedCategories.map(async (cat) => {
+            const nomineesRes = await api.get<JsonNominee[]>(
+              `/categories/${cat.id}/nominees`
+            );
+            return { ...cat, nominees: nomineesRes.data };
+          })
+        );
 
         setCategories(categoriesWithNominees);
 
         try {
-          const eventRes = await api.get<{ eventDate: string | null }>("/event");
+          const eventRes = await api.get<{ eventDate: string | null }>(
+            "/event"
+          );
           if (eventRes.data.eventDate) {
             setEventStartTime(new Date(eventRes.data.eventDate));
           }
@@ -84,12 +124,12 @@ const Nominees = () => {
               idsMap[vote.category] = vote.id;
             });
             setActiveNominees(votesMap);
+            setSavedNominees(votesMap);
             setVoteIds(idsMap);
           } catch (err) {
             console.error("Failed to fetch user votes", err);
           }
         }
-
       } catch (error) {
         console.error("Failed to load data:", error);
       } finally {
@@ -100,133 +140,214 @@ const Nominees = () => {
     fetchData();
   }, []);
 
-  const handleNextCategory = () => {
+  const handleNextCategory = useCallback(() => {
+    if (!categories.length) return;
     setCurrentCategoryIndex((prevIndex) => (prevIndex + 1) % categories.length);
     window.scrollTo(0, 0);
-  };
+  }, [categories.length]);
 
-  const handlePreviousCategory = () => {
+  const handlePreviousCategory = useCallback(() => {
+    if (!categories.length) return;
     setCurrentCategoryIndex(
       (prevIndex) => (prevIndex - 1 + categories.length) % categories.length
     );
     window.scrollTo(0, 0);
-  };
+  }, [categories.length]);
+
+  // Keyboard navigation between categories (Left / Right Arrow keys)
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      const target = event.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.tagName === "SELECT" ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        handlePreviousCategory();
+      } else if (event.key === "ArrowRight") {
+        event.preventDefault();
+        handleNextCategory();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleNextCategory, handlePreviousCategory]);
+
+  const isVotingClosed = eventStartTime ? new Date() >= eventStartTime : false;
 
   const handleSetActiveCard = (nominee: string) => {
-    if (!categories.length || isVotingClosed) return;
+    if (!categories.length || isVotingClosed || isSubmitting) return;
     const currentCategoryKey = categories[currentCategoryIndex].title || "";
     setActiveNominees((prev) => ({
       ...prev,
       [currentCategoryKey]:
         prev[currentCategoryKey] === nominee ? null : nominee,
     }));
+    if (feedback?.type === "error") {
+      showFeedback(null);
+    }
   };
 
   const onSaveVote = async () => {
     if (isVotingClosed) {
-      alert("Voting is closed!");
+      showFeedback({ type: "error", message: "Voting is closed." }, 4000);
       return;
     }
-    if (!categories.length) return;
+    if (isSubmitting || !categories.length) return;
+
     const currentCategoryKey = categories[currentCategoryIndex].title || "";
     const activeNominee = activeNominees[currentCategoryKey];
 
     if (!activeNominee) {
-      alert("Please select a nominee first!");
+      showFeedback(
+        { type: "error", message: "Please select a nominee first." },
+        3500
+      );
       return;
     }
 
     const token = localStorage.getItem("jwt");
     if (!token) {
-      alert("Please login to vote.");
+      showFeedback({ type: "error", message: "Please login to vote." }, 4000);
       return;
     }
 
+    setIsSubmitting(true);
     try {
       const existingVoteId = voteIds[currentCategoryKey];
 
       if (existingVoteId) {
-        // Update existing vote (PUT)
         await api.put(`/votes/${existingVoteId}`, {
           nominee: activeNominee,
         });
       } else {
-        // Create new vote (POST)
         const res = await api.post("/votes", {
           category: currentCategoryKey,
           nominee: activeNominee,
         });
 
-        // Update voteIds with the new vote ID
         if (res.data.vote?.id) {
-          setVoteIds(prev => ({
+          setVoteIds((prev) => ({
             ...prev,
-            [currentCategoryKey]: res.data.vote.id
+            [currentCategoryKey]: res.data.vote.id,
           }));
         }
       }
 
-      handleNextCategory();
+      setSavedNominees((prev) => ({
+        ...prev,
+        [currentCategoryKey]: activeNominee,
+      }));
+
+      showFeedback(
+        {
+          type: "success",
+          message: `Saved "${activeNominee}" for ${currentCategoryKey}`,
+        },
+        3200
+      );
+
+      if (currentCategoryIndex < categories.length - 1) {
+        handleNextCategory();
+      }
     } catch (error) {
       console.error("Failed to save vote:", error);
       if (error instanceof AxiosError) {
-        const errorData = error.response?.data;
-        alert(errorData?.message || "An error occurred");
+        const errorData = error.response?.data as
+          | { message?: string }
+          | undefined;
+        showFeedback(
+          {
+            type: "error",
+            message: errorData?.message || "Failed to save vote.",
+          },
+          4500
+        );
+      } else {
+        showFeedback(
+          { type: "error", message: "Failed to save vote." },
+          4500
+        );
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   if (isLoading) {
     return (
-      <div className="text-white text-center mt-20 font-barlow uppercase tracking-widest">
-        Loading 2026 Nominees...
+      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 py-16 flex flex-col items-center justify-center min-h-[60vh]">
+        <div className="w-12 h-12 border-4 border-[#FF641A] border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="text-zinc-300 font-barlow font-bold uppercase tracking-[0.22em] text-sm">
+          Loading 2026 Nominees...
+        </p>
       </div>
     );
   }
 
   if (categories.length === 0) {
     return (
-      <div className="text-white text-center mt-20 font-barlow uppercase tracking-widest">
-        No 2026 categories found.
+      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 py-20 text-center">
+        <p className="text-zinc-400 font-barlow font-bold uppercase tracking-[0.22em]">
+          No 2026 categories found.
+        </p>
       </div>
     );
   }
 
   const currentCategory = categories[currentCategoryIndex];
   const currentCategoryKey = currentCategory.title || "Unknown Category";
-
   const cardsData = currentCategory.nominees ?? [];
 
   const activeNominee = activeNominees[currentCategoryKey] || null;
-
+  const savedNominee = savedNominees[currentCategoryKey] || null;
+  const hasExistingVote = Boolean(voteIds[currentCategoryKey]);
+  const isAlreadySaved = Boolean(
+    activeNominee && savedNominee === activeNominee
+  );
   const isLastCategory = currentCategoryIndex === categories.length - 1;
-  const isVotingClosed = eventStartTime ? new Date() >= eventStartTime : false;
 
   const desktopGridCols =
     cardsData.length <= 4
-      ? "xl:grid-cols-4"
+      ? "lg:grid-cols-4 xl:grid-cols-4"
       : cardsData.length === 5
-      ? "xl:grid-cols-5"
-      : "xl:grid-cols-6";
+      ? "lg:grid-cols-3 xl:grid-cols-5"
+      : "lg:grid-cols-3 xl:grid-cols-6";
+
+  const buttonLabel = isVotingClosed
+    ? "Voting Closed"
+    : isSubmitting
+    ? "Saving..."
+    : isAlreadySaved
+    ? "Vote Saved"
+    : hasExistingVote && activeNominee
+    ? "Update Vote"
+    : "Save Vote";
 
   return (
-    <div className="flex flex-col items-center w-[94%] max-w-[1800px] mx-auto px-2 sm:px-4 pb-8">
-      <div className="mt-3 text-center">
-        <span className="text-orange-500 text-xs font-bold font-montserrat uppercase tracking-[0.3em]">
-          The Game Awards 2026 • Official Nominations ({currentCategoryIndex + 1}/{categories.length})
-        </span>
-      </div>
+    <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 pb-10 sm:pb-14">
       <NavigationComponent
         onPrevious={handlePreviousCategory}
         onNext={handleNextCategory}
         headerText={currentCategoryKey}
+        description={currentCategory.description}
+        currentIndex={currentCategoryIndex}
+        totalCategories={categories.length}
       />
-      <p className="my-2 md:my-3 text-neutral-50 font-barlow tracking-wider max-w-3xl text-center mx-2 min-h-[32px]">
-        {currentCategory.description}
-      </p>
 
+      {/* Nominee Grid */}
       <div
-        className={`w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 ${desktopGridCols} gap-4 lg:gap-5 mt-4 pb-6`}
+        key={currentCategoryKey}
+        className={`animate-category-enter w-full grid grid-cols-1 min-[360px]:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 ${desktopGridCols} gap-3.5 sm:gap-4 lg:gap-5 mt-2`}
       >
         {cardsData.map((nomineeData, index) => {
           const title = nomineeData.Nominee ?? nomineeData.name ?? "Unknown";
@@ -246,18 +367,90 @@ const Nominees = () => {
               genre={genre}
               background={background}
               active={title === activeNominee}
+              disabled={isVotingClosed || isSubmitting}
               setActiveCard={handleSetActiveCard}
             />
           );
         })}
       </div>
 
-      <div className={isLastCategory || isVotingClosed ? "hidden" : "pt-2"}>
-        <ButtonComponent
-          text={isVotingClosed ? "Voting Closed" : "Save Vote"}
-          onClick={onSaveVote}
-          disabled={isVotingClosed}
-        />
+      {/* Connected Voting Action Bar (sticky on mobile, static below grid on md+) */}
+      <div className="sticky bottom-3 md:static z-20 mt-7 sm:mt-9">
+        <div className="bg-[#141416] border border-zinc-800/90 rounded-md px-4 sm:px-6 py-3.5 sm:py-4 shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-6">
+          <div className="min-w-0 flex flex-col gap-1">
+            {feedback && (
+              <div
+                role="status"
+                aria-live="polite"
+                className={`text-xs font-montserrat font-bold uppercase tracking-wider flex items-center gap-2 ${
+                  feedback.type === "success"
+                    ? "text-emerald-400"
+                    : "text-red-400"
+                }`}
+              >
+                <span aria-hidden="true">
+                  {feedback.type === "success" ? "✓" : "!"}
+                </span>
+                <span className="truncate">{feedback.message}</span>
+              </div>
+            )}
+
+            {isVotingClosed ? (
+              <p className="text-sm font-barlow text-zinc-400">
+                Voting for The Game Awards 2026 has closed.
+              </p>
+            ) : activeNominee ? (
+              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 min-w-0">
+                <span className="text-[11px] font-montserrat font-bold uppercase tracking-[0.18em] text-zinc-500">
+                  Selected
+                </span>
+                <span className="font-barlow font-bold text-base sm:text-lg text-[#F5F5F5] uppercase tracking-tight truncate">
+                  {activeNominee}
+                </span>
+                {isAlreadySaved ? (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-sm bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] font-montserrat font-bold uppercase tracking-wider">
+                    Saved
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-sm bg-[#FF641A]/15 border border-[#FF641A]/35 text-[#FF641A] text-[10px] font-montserrat font-bold uppercase tracking-wider">
+                    {hasExistingVote ? "Modified" : "Ready"}
+                  </span>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm font-barlow text-zinc-400">
+                Select a nominee above to cast your vote in{" "}
+                <span className="text-zinc-200 font-semibold">
+                  {currentCategoryKey}
+                </span>
+                .
+              </p>
+            )}
+          </div>
+
+          <div className="flex items-center justify-end gap-3 shrink-0">
+            {isAlreadySaved && !isLastCategory && (
+              <button
+                type="button"
+                onClick={handleNextCategory}
+                className="px-4 py-2.5 rounded-sm border border-zinc-700 bg-[#1C1C20] hover:border-zinc-500 text-xs font-montserrat font-bold uppercase tracking-[0.15em] text-[#F5F5F5] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A]"
+              >
+                Next Category →
+              </button>
+            )}
+            <ButtonComponent
+              text={buttonLabel}
+              onClick={onSaveVote}
+              disabled={
+                isVotingClosed ||
+                isSubmitting ||
+                !activeNominee ||
+                isAlreadySaved
+              }
+              className="w-full sm:w-auto"
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
