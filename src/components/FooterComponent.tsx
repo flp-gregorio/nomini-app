@@ -7,7 +7,7 @@ const FooterComponent = () => {
         <div className="flex items-center gap-6">
           <Link
             to="/about"
-            className="text-sm text-zinc-400 hover:text-[#F5F5F5] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A] rounded-sm"
+            className="text-sm text-zinc-400 hover:text-[#F5F5F5] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A]"
           >
             About
           </Link>
@@ -20,7 +20,7 @@ const FooterComponent = () => {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Instagram"
-            className="text-zinc-500 hover:text-[#F5F5F5] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A] rounded-sm p-1"
+            className="text-zinc-500 hover:text-[#F5F5F5] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A] p-1"
           >
             <svg
               fill="none"
@@ -38,7 +38,7 @@ const FooterComponent = () => {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="LinkedIn"
-            className="text-zinc-500 hover:text-[#F5F5F5] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A] rounded-sm p-1"
+            className="text-zinc-500 hover:text-[#F5F5F5] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A] p-1"
           >
             <svg
               fill="currentColor"

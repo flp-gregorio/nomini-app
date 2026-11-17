@@ -6,6 +6,20 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --radius: 0px;
+  }
+
+  *,
+  *::before,
+  *::after {
+    border-radius: 0;
+  }
+
+  input[type="radio"] {
+    border-radius: 9999px;
+  }
+
   html,
   body {
     background-color: #09090B;

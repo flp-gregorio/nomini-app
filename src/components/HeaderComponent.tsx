@@ -83,7 +83,7 @@ const HeaderComponent = memo(() => {
   };
 
   const navLinkClass = (isActive: boolean) =>
-    `relative whitespace-nowrap py-2 text-xs lg:text-sm font-montserrat font-bold uppercase tracking-[0.12em] lg:tracking-[0.18em] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#09090B] rounded-sm ${
+    `relative whitespace-nowrap py-2 text-xs lg:text-sm font-montserrat font-bold uppercase tracking-[0.12em] lg:tracking-[0.18em] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#09090B] ${
       isActive
         ? "text-[#F5F5F5]"
         : "text-zinc-400 hover:text-[#F5F5F5]"
@@ -129,11 +129,11 @@ const HeaderComponent = memo(() => {
           <Link
             to="/"
             aria-label="Nomini — The Game Awards 2026 Home"
-            className="group relative flex items-center justify-center px-2.5 lg:px-5 py-1.5 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A]"
+            className="group relative flex items-center justify-center px-2.5 lg:px-5 py-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A]"
           >
             <span
               aria-hidden="true"
-              className="absolute inset-0 rounded-full bg-[#FF641A]/0 group-hover:bg-[#FF641A]/10 blur-md transition-colors duration-300"
+              className="absolute inset-0 bg-[#FF641A]/0 group-hover:bg-[#FF641A]/10 blur-md transition-colors duration-300"
             />
             <svg
               className="relative w-12 h-12 transition-transform duration-300 group-hover:scale-105 filter group-hover:drop-shadow-[0_0_12px_rgba(255,100,26,0.45)]"
@@ -211,7 +211,7 @@ const HeaderComponent = memo(() => {
                 aria-label="Toggle profile menu"
                 aria-expanded={profileOpen}
                 onClick={() => setProfileOpen((prev) => !prev)}
-                className={`ml-1.5 p-1 rounded-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A] ${
+                className={`ml-1.5 p-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A] ${
                   isProfileActive
                     ? "text-[#FF641A]"
                     : "text-zinc-400 hover:text-[#F5F5F5]"
@@ -235,7 +235,7 @@ const HeaderComponent = memo(() => {
 
               {profileOpen && (
                 <div className="absolute right-0 top-full pt-2 z-50 min-w-[176px]">
-                  <div className="bg-[#141416] border border-zinc-800 rounded-md shadow-2xl overflow-hidden">
+                  <div className="bg-[#141416] border border-zinc-800 shadow-2xl overflow-hidden">
                     <Link
                       to="/profile"
                       className="block px-4 py-3 text-xs font-montserrat font-bold tracking-[0.15em] text-[#F5F5F5] hover:bg-[#1C1C20] hover:text-[#FF641A] transition-colors"
@@ -262,7 +262,7 @@ const HeaderComponent = memo(() => {
             <Link
               to="/"
               aria-label="Nomini — The Game Awards 2026 Home"
-              className="group inline-flex items-center justify-center p-1 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A]"
+              className="group inline-flex items-center justify-center p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A]"
             >
               <svg
                 className="w-11 h-11 transition-transform duration-300 group-hover:scale-105"
@@ -289,7 +289,7 @@ const HeaderComponent = memo(() => {
                 onMouseEnter={item.to === "/admin" ? handlePrefetchAdmin : undefined}
                 onFocus={item.to === "/admin" ? handlePrefetchAdmin : undefined}
                 className={({ isActive }) =>
-                  `relative whitespace-nowrap py-1.5 text-[11px] sm:text-xs font-montserrat font-bold uppercase tracking-[0.12em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A] rounded-sm ${
+                  `relative whitespace-nowrap py-1.5 text-[11px] sm:text-xs font-montserrat font-bold uppercase tracking-[0.12em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A] ${
                     isActive
                       ? "text-[#FF641A]"
                       : "text-zinc-400 hover:text-[#F5F5F5]"

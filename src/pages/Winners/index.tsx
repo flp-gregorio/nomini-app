@@ -109,7 +109,7 @@ const Winners = () => {
               <button
                 key={year}
                 onClick={() => setSelectedYear(year)}
-                className={`px-5 py-2 rounded-full font-barlow font-bold text-sm uppercase tracking-wider transition-all duration-300 ${
+                className={`px-5 py-2 font-barlow font-bold text-sm uppercase tracking-wider transition-all duration-300 ${
                   selectedYear === year
                     ? "bg-orange-600 text-white shadow-lg shadow-orange-600/30"
                     : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white"
@@ -134,7 +134,7 @@ const Winners = () => {
           {winnersData.map((item) => (
             <div
               key={item.category.id}
-              className={`group relative bg-zinc-900 border rounded-xl overflow-hidden shadow-lg transition-all duration-300 ${
+              className={`group relative bg-zinc-900 border overflow-hidden shadow-lg transition-all duration-300 ${
                 item.winnerNominee
                   ? "border-orange-500/50 hover:shadow-orange-500/20"
                   : "border-zinc-800"
@@ -150,13 +150,13 @@ const Winners = () => {
                       className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent"></div>
-                    <div className="absolute top-3 right-3 bg-orange-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg animate-pulse">
+                    <div className="absolute top-3 right-3 bg-orange-600 text-white text-xs font-bold px-3 py-1 uppercase tracking-wider shadow-lg animate-pulse">
                       Winner
                     </div>
                   </>
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900/50">
-                    <div className="w-12 h-12 rounded-full border-2 border-zinc-700 flex items-center justify-center mb-2">
+                    <div className="w-12 h-12 border-2 border-zinc-700 flex items-center justify-center mb-2">
                       <span className="text-zinc-500 text-xl font-bold">?</span>
                     </div>
                     <span className="text-zinc-500 font-barlow uppercase tracking-widest text-sm">

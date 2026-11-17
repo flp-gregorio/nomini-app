@@ -90,7 +90,7 @@ const Leaderboard = () => {
         <div className="flex justify-center lg:justify-end gap-3 flex-wrap">
           <button
             onClick={() => setSelectedYear(null)}
-            className={`px-5 py-2 rounded-full font-barlow font-bold text-sm uppercase tracking-wider transition-all duration-300 ${
+            className={`px-5 py-2 font-barlow font-bold text-sm uppercase tracking-wider transition-all duration-300 ${
               selectedYear === null
                 ? "bg-orange-600 text-white shadow-lg shadow-orange-600/30"
                 : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white"
@@ -102,7 +102,7 @@ const Leaderboard = () => {
             <button
               key={year}
               onClick={() => setSelectedYear(year)}
-              className={`px-5 py-2 rounded-full font-barlow font-bold text-sm uppercase tracking-wider transition-all duration-300 ${
+              className={`px-5 py-2 font-barlow font-bold text-sm uppercase tracking-wider transition-all duration-300 ${
                 selectedYear === year
                   ? "bg-orange-600 text-white shadow-lg shadow-orange-600/30"
                   : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white"
@@ -138,7 +138,7 @@ const Leaderboard = () => {
                 return (
                   <li
                     key={user.id}
-                    className={`font-barlow font-bold uppercase tracking-wider flex items-center justify-between mb-2.5 py-3.5 px-6 rounded-lg shadow-md transition-transform hover:scale-[1.005] ${
+                    className={`font-barlow font-bold uppercase tracking-wider flex items-center justify-between mb-2.5 py-3.5 px-6 shadow-md transition-transform hover:scale-[1.005] ${
                       rank % 2 === 0 ? "bg-zinc-800/90" : "bg-zinc-900/90"
                     }`}
                   >

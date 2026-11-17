@@ -52,7 +52,7 @@ const CardComponent = memo(({
       aria-pressed={active}
       aria-label={`${nominee}${aux ? `, ${aux}` : ""}${active ? " (Selected)" : ""}`}
       style={{ containerType: "inline-size" }}
-      className={`group relative w-full aspect-[2/3] rounded-md overflow-hidden text-left bg-[#141416] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#09090B] ${
+      className={`group relative w-full aspect-[2/3] overflow-hidden text-left bg-[#141416] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#09090B] ${
         disabled ? "cursor-not-allowed opacity-80" : "cursor-pointer"
       } ${
         active
@@ -115,7 +115,7 @@ const CardComponent = memo(({
       {/* Top-Right Selection Indicator */}
       <div
         aria-hidden="true"
-        className={`absolute top-2.5 right-2.5 z-10 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-montserrat font-bold uppercase tracking-wider transition-all duration-200 ${
+        className={`absolute top-2.5 right-2.5 z-10 flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-montserrat font-bold uppercase tracking-wider transition-all duration-200 ${
           active
             ? "bg-[#FF641A] text-white opacity-100 scale-100 shadow-lg"
             : "bg-[#09090B]/75 text-zinc-300 border border-zinc-700/70 opacity-0 group-hover:opacity-100 scale-95 group-hover:scale-100"

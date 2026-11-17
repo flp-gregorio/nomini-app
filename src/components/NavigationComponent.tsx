@@ -49,7 +49,7 @@ const NavigationComponent = ({
         aria-valuenow={currentStep}
         aria-valuemin={1}
         aria-valuemax={safeTotal}
-        className="w-full h-[2px] bg-zinc-800/90 rounded-full overflow-hidden"
+        className="w-full h-[2px] bg-zinc-800/90 overflow-hidden"
       >
         <div
           className="h-full bg-[#FF641A] transition-all duration-300 ease-out"
@@ -64,7 +64,7 @@ const NavigationComponent = ({
           onClick={onPrevious}
           aria-label="Previous category"
           title="Previous category (Left Arrow)"
-          className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-zinc-800 bg-[#141416] text-zinc-300 hover:border-[#FF641A] hover:text-[#FF641A] hover:bg-[#FF641A]/10 active:scale-95 transition-all duration-200 flex items-center justify-center shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A]"
+          className="w-10 h-10 sm:w-11 sm:h-11 border border-zinc-800 bg-[#141416] text-zinc-300 hover:border-[#FF641A] hover:text-[#FF641A] hover:bg-[#FF641A]/10 active:scale-95 transition-all duration-200 flex items-center justify-center shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A]"
         >
           <FaArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" aria-hidden="true" />
         </button>
@@ -78,7 +78,7 @@ const NavigationComponent = ({
           onClick={onNext}
           aria-label="Next category"
           title="Next category (Right Arrow)"
-          className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-zinc-800 bg-[#141416] text-zinc-300 hover:border-[#FF641A] hover:text-[#FF641A] hover:bg-[#FF641A]/10 active:scale-95 transition-all duration-200 flex items-center justify-center shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A]"
+          className="w-10 h-10 sm:w-11 sm:h-11 border border-zinc-800 bg-[#141416] text-zinc-300 hover:border-[#FF641A] hover:text-[#FF641A] hover:bg-[#FF641A]/10 active:scale-95 transition-all duration-200 flex items-center justify-center shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A]"
         >
           <FaArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" aria-hidden="true" />
         </button>

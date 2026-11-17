@@ -154,7 +154,7 @@ const Admin = () => {
                         <button
                             type="button"
                             onClick={() => setActiveTab("event")}
-                            className={`px-4 py-2 rounded font-barlow font-bold text-sm uppercase tracking-wider transition-colors ${
+                            className={`px-4 py-2 font-barlow font-bold text-sm uppercase tracking-wider transition-colors ${
                                 activeTab === "event"
                                     ? "bg-yellow-600 text-white"
                                     : "bg-neutral-800 text-neutral-400 hover:text-white"
@@ -165,7 +165,7 @@ const Admin = () => {
                         <button
                             type="button"
                             onClick={() => setActiveTab("artwork")}
-                            className={`px-4 py-2 rounded font-barlow font-bold text-sm uppercase tracking-wider transition-colors ${
+                            className={`px-4 py-2 font-barlow font-bold text-sm uppercase tracking-wider transition-colors ${
                                 activeTab === "artwork"
                                     ? "bg-orange-600 text-white"
                                     : "bg-neutral-800 text-neutral-400 hover:text-white"
@@ -183,14 +183,14 @@ const Admin = () => {
 
                 {/* Winner feedback message */}
                 {message && (
-                    <div className="mb-6 p-4 bg-blue-600 rounded text-white font-bold">
+                    <div className="mb-6 p-4 bg-blue-600 text-white font-bold">
                         {message}
                     </div>
                 )}
 
                 {/* ── Event Date Section ── */}
                 <div className="w-full mb-8">
-                    <div className="bg-neutral-800 p-5 sm:p-6 rounded-lg shadow-lg border border-yellow-600/30 flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+                    <div className="bg-neutral-800 p-5 sm:p-6 shadow-lg border border-yellow-600/30 flex flex-col lg:flex-row lg:items-end justify-between gap-6">
                         <div>
                             <h2 className="text-2xl font-bold mb-1 text-yellow-400">Event Settings (TGA 2026)</h2>
                             <p className="text-neutral-400 text-sm">
@@ -213,20 +213,20 @@ const Admin = () => {
                                     type="datetime-local"
                                     value={newEventDate}
                                     onChange={(e) => setNewEventDate(e.target.value)}
-                                    className="w-full py-2 px-3 rounded bg-neutral-700 text-white border border-neutral-600 focus:outline-none focus:border-yellow-500"
+                                    className="w-full py-2 px-3 bg-neutral-700 text-white border border-neutral-600 focus:outline-none focus:border-yellow-500"
                                 />
                             </div>
                             <button
                                 onClick={() => handleSetEventDate(newEventDate || null)}
                                 disabled={isEventLoading || !newEventDate}
-                                className="bg-yellow-600 hover:bg-yellow-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-2 px-5 rounded transition-colors"
+                                className="bg-yellow-600 hover:bg-yellow-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-2 px-5 transition-colors"
                             >
                                 {isEventLoading ? "Saving..." : "Set Date"}
                             </button>
                             <button
                                 onClick={() => handleSetEventDate(null)}
                                 disabled={isEventLoading}
-                                className="bg-neutral-600 hover:bg-neutral-500 disabled:opacity-50 text-white font-bold py-2 px-5 rounded transition-colors"
+                                className="bg-neutral-600 hover:bg-neutral-500 disabled:opacity-50 text-white font-bold py-2 px-5 transition-colors"
                             >
                                 Set as TBA
                             </button>
@@ -237,7 +237,7 @@ const Admin = () => {
                 {/* ── Winners Section ── */}
                 <div className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     {categories.map((cat) => (
-                        <div key={cat.id} className="bg-neutral-800 p-5 rounded-lg shadow-lg flex flex-col">
+                        <div key={cat.id} className="bg-neutral-800 p-5 shadow-lg flex flex-col">
                             <h2 className="text-xl font-bold mb-4 text-yellow-400 border-b border-neutral-700 pb-2">
                                 {cat.title}
                             </h2>
@@ -245,7 +245,7 @@ const Admin = () => {
                                 {cat.nominees?.map((nominee) => (
                                     <div
                                         key={nominee.id}
-                                        className={`flex justify-between items-center gap-3 p-3 rounded ${nominee.Winner
+                                        className={`flex justify-between items-center gap-3 p-3 ${nominee.Winner
                                             ? "bg-green-900 border border-green-500"
                                             : "bg-neutral-700"
                                             }`}
@@ -261,7 +261,7 @@ const Admin = () => {
                                                 onClick={() =>
                                                     handleSetWinner(cat.title, nominee.name)
                                                 }
-                                                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs transition-colors"
+                                                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 text-xs transition-colors"
                                             >
                                                 Set Winner
                                             </button>

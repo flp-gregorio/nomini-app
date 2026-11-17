@@ -396,31 +396,31 @@ const AdminArtworkManager = () => {
     <div className="space-y-6">
       {/* Provider Config Banner */}
       {steamGridConfigured === false && (
-        <div className="p-4 rounded-md bg-amber-950/60 border border-amber-500/50 text-amber-200 text-sm">
+        <div className="p-4 bg-amber-950/60 border border-amber-500/50 text-amber-200 text-sm">
           <p className="font-bold uppercase tracking-wider text-amber-400 mb-1">
             SteamGridDB API Key Required for Automated Discovery
           </p>
           <p>
-            Add <code className="bg-black/40 px-1.5 py-0.5 rounded">STEAMGRIDDB_API_KEY</code> to{" "}
-            <code className="bg-black/40 px-1.5 py-0.5 rounded">nomini-api/.env</code> and restart the API server. You can still assign manual fallback image URLs below.
+            Add <code className="bg-black/40 px-1.5 py-0.5">STEAMGRIDDB_API_KEY</code> to{" "}
+            <code className="bg-black/40 px-1.5 py-0.5">nomini-api/.env</code> and restart the API server. You can still assign manual fallback image URLs below.
           </p>
         </div>
       )}
 
       {/* Summary & Batch Controls */}
-      <div className="bg-neutral-800/90 border border-neutral-700 rounded-lg p-5 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+      <div className="bg-neutral-800/90 border border-neutral-700 p-5 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex flex-wrap items-center gap-3">
             <h2 className="text-xl font-bold text-orange-400">
               Nominee Artwork Discovery &amp; Approval
             </h2>
             {steamGridConfigured && (
-              <span className="text-xs px-2 py-0.5 rounded bg-emerald-900/60 border border-emerald-500/40 text-emerald-300 font-semibold">
+              <span className="text-xs px-2 py-0.5 bg-emerald-900/60 border border-emerald-500/40 text-emerald-300 font-semibold">
                 SteamGridDB Connected
               </span>
             )}
             {igdbConfigured && (
-              <span className="text-xs px-2 py-0.5 rounded bg-blue-900/60 border border-blue-500/40 text-blue-300 font-semibold">
+              <span className="text-xs px-2 py-0.5 bg-blue-900/60 border border-blue-500/40 text-blue-300 font-semibold">
                 IGDB Fallback Ready
               </span>
             )}
@@ -439,7 +439,7 @@ const AdminArtworkManager = () => {
               value={selectedYear ?? ""}
               onChange={(e) => handleYearChange(Number(e.target.value))}
               aria-label="Filter by year"
-              className="bg-neutral-900 border border-neutral-600 rounded px-3 py-2 text-sm text-white"
+              className="bg-neutral-900 border border-neutral-600 px-3 py-2 text-sm text-white"
             >
               {years.map((y) => (
                 <option key={y} value={y}>
@@ -453,7 +453,7 @@ const AdminArtworkManager = () => {
             type="button"
             disabled={isDiscoveringAll || steamGridConfigured === false}
             onClick={() => handleDiscoverMissing(false)}
-            className="bg-orange-600 hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold px-4 py-2 rounded text-sm transition-colors"
+            className="bg-orange-600 hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold px-4 py-2 text-sm transition-colors"
           >
             {isDiscoveringAll
               ? "Discovering..."
@@ -465,7 +465,7 @@ const AdminArtworkManager = () => {
               type="button"
               disabled={isBulkSaving}
               onClick={handleBulkApproveExact}
-              className="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold px-4 py-2 rounded text-sm transition-colors"
+              className="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold px-4 py-2 text-sm transition-colors"
             >
               {isBulkSaving
                 ? "Approving..."
@@ -478,7 +478,7 @@ const AdminArtworkManager = () => {
       {/* Feedback Banner */}
       {statusMessage && (
         <div
-          className={`p-3.5 rounded border text-sm font-semibold ${
+          className={`p-3.5 border text-sm font-semibold ${
             statusMessage.type === "success"
               ? "bg-emerald-950/70 border-emerald-500/50 text-emerald-300"
               : statusMessage.type === "error"
@@ -505,7 +505,7 @@ const AdminArtworkManager = () => {
               key={tab.id}
               type="button"
               onClick={() => setFilterMode(tab.id)}
-              className={`px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition-colors ${
+              className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-colors ${
                 filterMode === tab.id
                   ? "bg-orange-600 text-white"
                   : "bg-neutral-800 text-neutral-400 hover:text-white"
@@ -521,7 +521,7 @@ const AdminArtworkManager = () => {
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
           placeholder="Filter nominees..."
-          className="bg-neutral-800 border border-neutral-700 rounded px-3 py-1.5 text-sm text-white placeholder-neutral-500 sm:w-64"
+          className="bg-neutral-800 border border-neutral-700 px-3 py-1.5 text-sm text-white placeholder-neutral-500 sm:w-64"
         />
       </div>
 
@@ -543,12 +543,12 @@ const AdminArtworkManager = () => {
             return (
               <div
                 key={item.name}
-                className="bg-neutral-800/70 border border-neutral-700/80 rounded-lg p-4 sm:p-5 space-y-4"
+                className="bg-neutral-800/70 border border-neutral-700/80 p-4 sm:p-5 space-y-4"
               >
                 <div className="flex flex-col lg:flex-row gap-5 justify-between">
                   {/* Left: Selected Artwork Preview + Nominee Info */}
                   <div className="flex gap-4 items-start">
-                    <div className="w-20 h-24 shrink-0 rounded overflow-hidden bg-neutral-900 border border-neutral-700 flex items-center justify-center">
+                    <div className="w-20 h-24 shrink-0 overflow-hidden bg-neutral-900 border border-neutral-700 flex items-center justify-center">
                       {activePreviewUrl ? (
                         <img
                           src={activePreviewUrl}
@@ -570,18 +570,18 @@ const AdminArtworkManager = () => {
                           {item.name}
                         </h3>
                         {item.artwork ? (
-                          <span className="text-[11px] px-2 py-0.5 rounded bg-emerald-900/60 border border-emerald-500/40 text-emerald-300 font-semibold uppercase">
+                          <span className="text-[11px] px-2 py-0.5 bg-emerald-900/60 border border-emerald-500/40 text-emerald-300 font-semibold uppercase">
                             {item.artwork.provider}
                             {item.artwork.width && item.artwork.height
                               ? ` • ${item.artwork.width}×${item.artwork.height}`
                               : ""}
                           </span>
                         ) : item.existingLocalImage ? (
-                          <span className="text-[11px] px-2 py-0.5 rounded bg-neutral-700 text-neutral-300">
+                          <span className="text-[11px] px-2 py-0.5 bg-neutral-700 text-neutral-300">
                             Seeded Path
                           </span>
                         ) : (
-                          <span className="text-[11px] px-2 py-0.5 rounded bg-amber-900/40 border border-amber-500/30 text-amber-300">
+                          <span className="text-[11px] px-2 py-0.5 bg-amber-900/40 border border-amber-500/30 text-amber-300">
                             Unassigned
                           </span>
                         )}
@@ -625,13 +625,13 @@ const AdminArtworkManager = () => {
                           }))
                         }
                         aria-label={`Search SteamGridDB for ${item.name}`}
-                        className="bg-neutral-900 border border-neutral-600 rounded px-2.5 py-1.5 text-xs text-white w-48"
+                        className="bg-neutral-900 border border-neutral-600 px-2.5 py-1.5 text-xs text-white w-48"
                       />
                       <button
                         type="button"
                         disabled={isBusy || steamGridConfigured === false}
                         onClick={() => handleDiscoverSingle(item.name)}
-                        className="bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-bold px-3 py-1.5 rounded text-xs transition-colors"
+                        className="bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-bold px-3 py-1.5 text-xs transition-colors"
                       >
                         {isBusy ? "Searching..." : "Search SteamGridDB"}
                       </button>
@@ -640,7 +640,7 @@ const AdminArtworkManager = () => {
                           type="button"
                           disabled={isBusy}
                           onClick={() => handleClearArtwork(item.name)}
-                          className="bg-neutral-700 hover:bg-red-700 text-white font-bold px-3 py-1.5 rounded text-xs transition-colors"
+                          className="bg-neutral-700 hover:bg-red-700 text-white font-bold px-3 py-1.5 text-xs transition-colors"
                         >
                           Clear
                         </button>
@@ -659,7 +659,7 @@ const AdminArtworkManager = () => {
                           }))
                         }
                         placeholder="Manual fallback image URL (https://...)"
-                        className="bg-neutral-900 border border-neutral-600 rounded px-2.5 py-1.5 text-xs text-white w-56"
+                        className="bg-neutral-900 border border-neutral-600 px-2.5 py-1.5 text-xs text-white w-56"
                       />
                       <button
                         type="button"
@@ -671,7 +671,7 @@ const AdminArtworkManager = () => {
                             type: "manual",
                           })
                         }
-                        className="bg-neutral-700 hover:bg-neutral-600 disabled:opacity-40 text-white font-bold px-3 py-1.5 rounded text-xs transition-colors"
+                        className="bg-neutral-700 hover:bg-neutral-600 disabled:opacity-40 text-white font-bold px-3 py-1.5 text-xs transition-colors"
                       >
                         Set URL
                       </button>
@@ -691,7 +691,7 @@ const AdminArtworkManager = () => {
                         type="button"
                         disabled={isBusy}
                         onClick={() => handleSwitchMatchedGame(item.name, sug)}
-                        className={`text-xs px-2.5 py-1 rounded border transition-colors ${
+                        className={`text-xs px-2.5 py-1 border transition-colors ${
                           disc.matchedGame?.id === sug.id
                             ? "border-orange-500 bg-orange-500/20 text-orange-300"
                             : "border-neutral-600 bg-neutral-900 text-neutral-300 hover:border-neutral-400"
@@ -740,7 +740,7 @@ const AdminArtworkManager = () => {
                               [item.name]: assetTab.id,
                             }))
                           }
-                          className={`px-2.5 py-1 rounded text-xs font-bold transition-colors ${
+                          className={`px-2.5 py-1 text-xs font-bold transition-colors ${
                             tab === assetTab.id
                               ? "bg-orange-600 text-white"
                               : "bg-neutral-900 text-neutral-400 hover:text-white"
@@ -768,7 +768,7 @@ const AdminArtworkManager = () => {
                               onClick={() =>
                                 handleSelectCandidate(item.name, cand)
                               }
-                              className={`group relative rounded overflow-hidden border text-left bg-neutral-900 transition-all ${
+                              className={`group relative overflow-hidden border text-left bg-neutral-900 transition-all ${
                                 isSelected
                                   ? "border-2 border-orange-500 ring-2 ring-orange-500/30"
                                   : "border-neutral-700 hover:border-orange-400"

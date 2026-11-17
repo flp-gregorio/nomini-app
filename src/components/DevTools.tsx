@@ -38,7 +38,7 @@ const DevTools: React.FC = () => {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-4 right-4 bg-yellow-500 hover:bg-yellow-400 text-black font-bold p-3 rounded-full shadow-lg z-50 transition-all font-mono text-sm"
+        className="fixed bottom-4 right-4 bg-yellow-500 hover:bg-yellow-400 text-black font-bold p-3 shadow-lg z-50 transition-all font-mono text-sm"
         title="Open DevTools"
       >
         🛠 Dev
@@ -47,7 +47,7 @@ const DevTools: React.FC = () => {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 bg-zinc-900 border border-yellow-500 text-white p-4 rounded-lg shadow-2xl z-50 w-72 flex flex-col gap-4 font-mono text-sm">
+    <div className="fixed bottom-4 right-4 bg-zinc-900 border border-yellow-500 text-white p-4 shadow-2xl z-50 w-72 flex flex-col gap-4 font-mono text-sm">
       <div className="flex justify-between items-center border-b border-zinc-700 pb-2">
         <h3 className="font-bold text-yellow-500 text-lg">🛠 DevTools</h3>
         <button
@@ -63,7 +63,7 @@ const DevTools: React.FC = () => {
         <button
           disabled={isLoading}
           onClick={() => handleLogin('admin_dev')}
-          className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-3 rounded text-left transition-colors flex justify-between items-center"
+          className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-3 text-left transition-colors flex justify-between items-center"
         >
           <span>Login as Admin</span>
           <span className="text-xs opacity-75">admin_dev</span>
@@ -71,14 +71,14 @@ const DevTools: React.FC = () => {
         <button
           disabled={isLoading}
           onClick={() => handleLogin('test_dev')}
-          className="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-3 rounded text-left transition-colors flex justify-between items-center"
+          className="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-3 text-left transition-colors flex justify-between items-center"
         >
           <span>Login as User</span>
           <span className="text-xs opacity-75">test_dev</span>
         </button>
         <button
           onClick={handleLogout}
-          className="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-3 rounded text-left transition-colors mt-1"
+          className="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-3 text-left transition-colors mt-1"
         >
           Clear Session (Logout)
         </button>

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { AxiosError } from "axios";
 import CardComponent from "../../components/CardComponent";
 import NavigationComponent from "../../components/NavigationComponent";
+import CategoryNavigationGrid from "../../components/CategoryNavigationGrid";
 import ButtonComponent from "../../components/ButtonComponent";
 import api from "../../lib/api";
 
@@ -156,6 +157,16 @@ const Nominees = () => {
     );
     window.scrollTo(0, 0);
   }, [categories.length]);
+
+  const handleSelectCategory = useCallback(
+    (index: number) => {
+      if (index < 0 || index >= categories.length) return;
+      if (index === currentCategoryIndex) return;
+      setCurrentCategoryIndex(index);
+      window.scrollTo(0, 0);
+    },
+    [categories.length, currentCategoryIndex]
+  );
 
   // Keyboard navigation between categories (Left / Right Arrow keys)
   useEffect(() => {
@@ -392,7 +403,7 @@ const Nominees = () => {
 
       {/* Connected Voting Action Bar (sticky on mobile below cards, static below grid on md+) */}
       <div className="sticky bottom-3 md:static z-20 mt-6 md:mt-5">
-        <div className="bg-[#141416] border border-zinc-800/90 rounded-md px-4 sm:px-6 py-3 sm:py-3.5 shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-6">
+        <div className="bg-[#141416] border border-zinc-800/90 px-4 sm:px-6 py-3 sm:py-3.5 shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-6">
           <div className="min-w-0 flex flex-col gap-1">
             {feedback && (
               <div
@@ -424,11 +435,11 @@ const Nominees = () => {
                   {activeNominee}
                 </span>
                 {isAlreadySaved ? (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-sm bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] font-montserrat font-bold uppercase tracking-wider">
+                  <span className="inline-flex items-center px-2 py-0.5 bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] font-montserrat font-bold uppercase tracking-wider">
                     Saved
                   </span>
                 ) : (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-sm bg-[#FF641A]/15 border border-[#FF641A]/35 text-[#FF641A] text-[10px] font-montserrat font-bold uppercase tracking-wider">
+                  <span className="inline-flex items-center px-2 py-0.5 bg-[#FF641A]/15 border border-[#FF641A]/35 text-[#FF641A] text-[10px] font-montserrat font-bold uppercase tracking-wider">
                     {hasExistingVote ? "Modified" : "Ready"}
                   </span>
                 )}
@@ -449,7 +460,7 @@ const Nominees = () => {
               <button
                 type="button"
                 onClick={handleNextCategory}
-                className="px-4 py-2.5 rounded-sm border border-zinc-700 bg-[#1C1C20] hover:border-zinc-500 text-xs font-montserrat font-bold uppercase tracking-[0.15em] text-[#F5F5F5] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A]"
+                className="px-4 py-2.5 border border-zinc-700 bg-[#1C1C20] hover:border-zinc-500 text-xs font-montserrat font-bold uppercase tracking-[0.15em] text-[#F5F5F5] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF641A]"
               >
                 Next Category →
               </button>
@@ -468,6 +479,12 @@ const Nominees = () => {
           </div>
         </div>
       </div>
+
+      <CategoryNavigationGrid
+        categories={categories}
+        currentIndex={currentCategoryIndex}
+        onSelectCategory={handleSelectCategory}
+      />
     </div>
   );
 };

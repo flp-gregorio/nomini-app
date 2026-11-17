@@ -56,7 +56,7 @@ const Profile = () => {
 
   return (
     <div className="flex justify-center items-start py-6 sm:py-10 px-4">
-      <div className="bg-zinc-900 p-6 sm:p-8 shadow-md max-w-2xl w-full mx-auto overflow-visible border border-zinc-800/80 rounded-lg">
+      <div className="bg-zinc-900 p-6 sm:p-8 shadow-md max-w-2xl w-full mx-auto overflow-visible border border-zinc-800/80">
         <div>
           <div className="text-white text-xl mb-6 font-semibold text-center">
             Hello, {username && <span className="text-orange-700">{username}</span>}!

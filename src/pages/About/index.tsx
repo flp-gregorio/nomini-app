@@ -2,7 +2,7 @@ const About = () => {
   return (
     <div className="w-[92%] max-w-6xl mx-auto px-2 sm:px-4 py-8 text-white uppercase font-roboto-mono">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        <div className="lg:col-span-7 bg-zinc-900/70 border border-zinc-800 rounded-lg p-6 sm:p-8 text-left">
+        <div className="lg:col-span-7 bg-zinc-900/70 border border-zinc-800 p-6 sm:p-8 text-left">
           <h1 className="text-3xl sm:text-4xl font-bold font-barlow text-orange-500 tracking-tight">
             About Nomini
           </h1>
@@ -20,7 +20,7 @@ const About = () => {
           </p>
         </div>
 
-        <div className="lg:col-span-5 bg-zinc-900/70 border border-zinc-800 rounded-lg p-6 sm:p-8 text-left">
+        <div className="lg:col-span-5 bg-zinc-900/70 border border-zinc-800 p-6 sm:p-8 text-left">
           <h2 className="text-xl font-bold font-barlow text-white tracking-wider">
             Credits &amp; Project
           </h2>
