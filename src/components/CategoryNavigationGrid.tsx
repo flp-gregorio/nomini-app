@@ -11,10 +11,10 @@ type CategoryNavigationGridProps = {
   onSelectCategory: (index: number) => void;
 };
 
-/** Keeps the grid taller than it is wide. 30 -> 5x6, 25 -> 4x7. */
+/** Landscape layout, maximum 10 columns. 30 -> 10x3. */
 function getGridColumns(total: number): number {
-  if (total <= 1) return 1;
-  return Math.max(1, Math.floor(Math.sqrt(total - 1)));
+  if (total <= 0) return 1;
+  return Math.min(10, total);
 }
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -26,6 +26,7 @@ const CategoryNavigationGrid = memo(
     onSelectCategory,
   }: CategoryNavigationGridProps) => {
     const gridRef = useRef<HTMLDivElement>(null);
+
     const total = categories?.length ?? 0;
     const columns = getGridColumns(total);
 
@@ -37,6 +38,7 @@ const CategoryNavigationGrid = memo(
         const focused = Array.from(buttons).indexOf(
           document.activeElement as Element
         );
+
         if (focused === -1) return;
 
         const delta: Record<string, number> = {
@@ -65,6 +67,10 @@ const CategoryNavigationGrid = memo(
     const currentPosition =
       currentIndex >= 0 && currentIndex < total ? currentIndex + 1 : 0;
 
+    const remainder = total % columns;
+    const lastRowStart = total - remainder;
+    const lastRowOffset = Math.floor((columns - remainder) / 2);
+
     return (
       <nav
         aria-label="Category navigation grid"
@@ -89,19 +95,34 @@ const CategoryNavigationGrid = memo(
             ref={gridRef}
             onKeyDown={handleKeyDown}
             className="grid w-fit max-w-full justify-center gap-x-2 gap-y-2.5"
-            style={{ gridTemplateColumns: `repeat(${columns}, 10px)` }}
+            style={{
+              gridTemplateColumns: `repeat(${columns}, 10px)`,
+            }}
           >
             {categories.map((category, index) => {
               const categoryTitle =
                 category.title?.trim() || `Category ${index + 1}`;
+
               const isCurrent = index === currentIndex;
               const isPast = index < currentIndex;
-              const colIndex = index % columns;
+
+              const isInLastRow = remainder > 0 && index >= lastRowStart;
+
+              const visualColumn = isInLastRow
+                ? lastRowOffset + (index - lastRowStart)
+                : index % columns;
+
+              const gridPlacement = isInLastRow
+                ? {
+                    gridColumnStart: visualColumn + 1,
+                    gridRowStart: Math.floor(index / columns) + 1,
+                  }
+                : undefined;
 
               const tooltipPosition =
-                columns > 2 && colIndex === 0
+                visualColumn === 0
                   ? "left-0"
-                  : columns > 2 && colIndex === columns - 1
+                  : visualColumn === columns - 1
                   ? "right-0"
                   : "left-1/2 -translate-x-1/2";
 
@@ -118,8 +139,10 @@ const CategoryNavigationGrid = memo(
                   onClick={() => onSelectCategory(index)}
                   aria-current={isCurrent ? "step" : undefined}
                   aria-label={categoryTitle}
+                  style={gridPlacement}
                   className={`group relative z-0 h-[10px] w-[10px] shrink-0 rounded-none border-0 p-0 outline-none transition-all duration-300 ease-out hover:z-10 hover:scale-125 motion-reduce:transition-none focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-[#FF641A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#09090B] ${state}`}
                 >
+                  {/* Tooltip */}
                   <span
                     aria-hidden="true"
                     className={`pointer-events-none invisible absolute bottom-full z-30 mb-3 flex w-max max-w-[180px] translate-y-1 flex-col items-center gap-0.5 border-l-2 border-[#FF641A] bg-black/95 px-2.5 py-1.5 text-center opacity-0 shadow-[0_8px_24px_rgba(0,0,0,0.6)] transition-all duration-200 ease-out motion-reduce:transition-none group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:visible group-focus-visible:translate-y-0 group-focus-visible:opacity-100 sm:max-w-[240px] ${tooltipPosition}`}
