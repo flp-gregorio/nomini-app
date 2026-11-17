@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import ButtonComponent from "../../components/ButtonComponent";
-import api from "../../lib/api";
+import { dataService } from "../../services/dataService";
 
 const Home = () => {
   const [countdown, setCountdown] = useState("");
@@ -13,10 +13,10 @@ const Home = () => {
     const token = localStorage.getItem("jwt");
     setVoteLink(token ? "/nominees" : "/login");
 
-    // Fetch event date from backend
-    api.get<{ eventDate: string | null }>("/event")
-      .then(res => {
-        setEventDate(res.data.eventDate ? new Date(res.data.eventDate) : null);
+    // Fetch event date from backend (shared cache with Nominees/Admin)
+    dataService.getEvent()
+      .then(data => {
+        setEventDate(data.eventDate ? new Date(data.eventDate) : null);
       })
       .catch(() => {
         // Fall back to the confirmed 2026 event date if the API is unreachable

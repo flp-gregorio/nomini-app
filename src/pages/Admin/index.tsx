@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import api from "../../lib/api";
+import { dataService } from "../../services/dataService";
 import AdminArtworkManager from "../../components/AdminArtworkManager";
 import { useAuth } from "../../hooks/useAuth";
 
 type JsonNominee = {
-    id: string;
+    id: string | number;
     name: string;
-    Winner: boolean;
+    Winner?: boolean;
 };
 
 type JsonCategory = {
@@ -32,37 +33,28 @@ const Admin = () => {
     useEffect(() => {
         if (isAuthLoading || !isAdmin || hasLoadedRef.current) return;
         hasLoadedRef.current = true;
-        fetchData();
-        fetchEventDate();
+        void loadAdminInitialData();
     }, [isAuthLoading, isAdmin]);
 
-    const fetchEventDate = async () => {
+    const loadAdminInitialData = async () => {
+        setIsLoading(true);
         try {
-            const res = await api.get<{ eventDate: string | null }>("/event");
-            setCurrentEventDate(res.data.eventDate);
-        } catch (error) {
-            console.error("Failed to load event date:", error);
-        }
-    };
+            const [categoriesRes, eventRes] = await Promise.allSettled([
+                dataService.getCategoriesWithNominees(undefined, true),
+                dataService.getEvent(true),
+            ]);
 
-    const fetchData = async () => {
-        try {
-            setIsLoading(true);
-            const categoriesRes = await api.get<JsonCategory[]>("/categories");
-            const fetchedCategories = categoriesRes.data;
+            if (categoriesRes.status === "fulfilled") {
+                setCategories(categoriesRes.value);
+            } else {
+                console.error("Failed to load data:", categoriesRes.reason);
+            }
 
-            const categoriesWithNominees = await Promise.all(
-                fetchedCategories.map(async (cat) => {
-                    const nomineesRes = await api.get<JsonNominee[]>(
-                        `/categories/${cat.id}/nominees`
-                    );
-                    return { ...cat, nominees: nomineesRes.data };
-                })
-            );
-
-            setCategories(categoriesWithNominees);
-        } catch (error) {
-            console.error("Failed to load data:", error);
+            if (eventRes.status === "fulfilled") {
+                setCurrentEventDate(eventRes.value.eventDate);
+            } else {
+                console.error("Failed to load event date:", eventRes.reason);
+            }
         } finally {
             setIsLoading(false);
         }
@@ -75,7 +67,20 @@ const Admin = () => {
                 nominee,
             });
             setMessage(res.data.message);
-            fetchData();
+            dataService.invalidateCatalogCache();
+            setCategories((prev) =>
+                prev.map((cat) =>
+                    cat.title === category
+                        ? {
+                              ...cat,
+                              nominees: cat.nominees.map((n) => ({
+                                  ...n,
+                                  Winner: n.name === nominee,
+                              })),
+                          }
+                        : cat
+                )
+            );
         } catch (error) {
             console.error("Failed to set winner:", error);
             const err = error as { response?: { data?: { message?: string } } };
@@ -90,6 +95,7 @@ const Admin = () => {
             const res = await api.post("/event", {
                 eventDate: dateValue,
             });
+            dataService.invalidateEventCache();
             setEventMessage(res.data.message);
             setCurrentEventDate(res.data.eventDate ?? null);
             setNewEventDate("");

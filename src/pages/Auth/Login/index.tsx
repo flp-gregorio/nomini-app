@@ -6,6 +6,7 @@ import ButtonComponent from "../../../components/ButtonComponent";
 import InputComponent from "../../../components/InputComponent";
 import LayoutAuthComponent from "../../../components/Layouts/LayoutAuthComponent";
 import api from "../../../lib/api";
+import { dataService } from "../../../services/dataService";
 import { AxiosError } from "axios";
 import { useAuth } from "../../../hooks/useAuth";
 
@@ -24,22 +25,10 @@ const Login = () => {
     try {
       const response = await api.post("/auth/login", data);
       localStorage.setItem("jwt", response.data.token);
+
+      // Warm public categories catalog in parallel without blocking navigation
+      void dataService.getCategoriesWithNominees().catch(() => {});
       await refreshUser();
-
-
-      try {
-        const { dataService } = await import("../../../services/dataService");
-        const { preloadImages } = await import("../../../utils/preloadImages");
-
-        const nominees = await dataService.getAllNominees();
-        const imageUrls = nominees
-          .map((n) => n.image)
-          .filter((url): url is string => !!url);
-
-        await preloadImages(imageUrls);
-      } catch (preloadError) {
-        console.error("Preloading failed, continuing anyway:", preloadError);
-      }
 
       nav("/nominees");
     } catch (error) {

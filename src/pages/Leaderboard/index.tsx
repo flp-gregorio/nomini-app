@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import WhiteButtonComponent from "../../components/WhiteButtonComponent";
 import api from "../../lib/api";
+import { dataService } from "../../services/dataService";
 
 type LeaderboardUser = {
   id: number;
@@ -37,7 +38,7 @@ const Leaderboard = () => {
   useEffect(() => {
     const fetchYears = async () => {
       try {
-        const { data } = await api.get<number[]>("/categories/years");
+        const data = await dataService.getYears();
         setYears(data);
       } catch (error) {
         console.error("Error fetching years:", error);

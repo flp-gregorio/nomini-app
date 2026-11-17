@@ -7,6 +7,7 @@ import CategoryNavigationGrid, {
 } from "../../components/CategoryNavigationGrid";
 import ButtonComponent from "../../components/ButtonComponent";
 import api from "../../lib/api";
+import { dataService } from "../../services/dataService";
 
 import { NomineeArtwork } from "../../@types/NomineeType";
 
@@ -89,40 +90,44 @@ const Nominees = () => {
   }, []);
 
   useEffect(() => {
+    const controller = new AbortController();
+    let isMounted = true;
+
     const fetchData = async () => {
       try {
         setIsLoading(true);
+        const token = localStorage.getItem("jwt");
 
-        const categoriesRes = await api.get<JsonCategory[]>("/categories");
-        const fetchedCategories = categoriesRes.data;
+        const [categoriesResult, eventResult, votesResult] =
+          await Promise.allSettled([
+            dataService.getCategoriesWithNominees(),
+            dataService.getEvent(),
+            token
+              ? api
+                  .get<UserVote[]>("/votes/user", { signal: controller.signal })
+                  .then((res) => res.data)
+              : Promise.resolve([] as UserVote[]),
+          ]);
 
-        const categoriesWithNominees = await Promise.all(
-          fetchedCategories.map(async (cat) => {
-            const nomineesRes = await api.get<JsonNominee[]>(
-              `/categories/${cat.id}/nominees`
-            );
-            return { ...cat, nominees: nomineesRes.data };
-          })
-        );
+        if (!isMounted) return;
 
-        setCategories(categoriesWithNominees);
-
-        try {
-          const eventRes = await api.get<{ eventDate: string | null }>(
-            "/event"
-          );
-          if (eventRes.data.eventDate) {
-            setEventStartTime(new Date(eventRes.data.eventDate));
-          }
-        } catch (err) {
-          console.error("Failed to fetch event date", err);
+        if (categoriesResult.status === "fulfilled") {
+          setCategories(categoriesResult.value);
+        } else {
+          console.error("Failed to load categories:", categoriesResult.reason);
         }
 
-        const token = localStorage.getItem("jwt");
+        if (eventResult.status === "fulfilled") {
+          if (eventResult.value.eventDate) {
+            setEventStartTime(new Date(eventResult.value.eventDate));
+          }
+        } else {
+          console.error("Failed to fetch event date", eventResult.reason);
+        }
+
         if (token) {
-          try {
-            const votesRes = await api.get<UserVote[]>("/votes/user");
-            const votes = votesRes.data;
+          if (votesResult.status === "fulfilled") {
+            const votes = votesResult.value;
             const votesMap: Record<string, string> = {};
             const idsMap: Record<string, number> = {};
             votes.forEach((vote) => {
@@ -132,18 +137,27 @@ const Nominees = () => {
             setActiveNominees(votesMap);
             setSavedNominees(votesMap);
             setVoteIds(idsMap);
-          } catch (err) {
-            console.error("Failed to fetch user votes", err);
+          } else if (!controller.signal.aborted) {
+            console.error("Failed to fetch user votes", votesResult.reason);
           }
         }
       } catch (error) {
-        console.error("Failed to load data:", error);
+        if (!controller.signal.aborted) {
+          console.error("Failed to load data:", error);
+        }
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
-    fetchData();
+    void fetchData();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
   }, []);
 
   const handleNextCategory = useCallback(() => {

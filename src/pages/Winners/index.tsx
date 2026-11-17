@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Category, Nominee } from "../../@types/NomineeType";
-import api from "../../lib/api";
+import { dataService } from "../../services/dataService";
 
 interface NomineeWithStatus extends Nominee {
   Winner?: boolean;
@@ -18,64 +18,34 @@ const Winners = () => {
   const [years, setYears] = useState<number[]>([]);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
 
-  // Fetch available years on mount
+  // Fetch consolidated winners (and available years) in a single request
   useEffect(() => {
-    const fetchYears = async () => {
-      try {
-        const { data } = await api.get<number[]>("/categories/years");
-        setYears(data);
-        if (data.length > 0) {
-          setSelectedYear(data[0]); // latest year (sorted desc)
-        }
-      } catch (error) {
-        console.error("Error fetching years:", error);
-      }
-    };
-    fetchYears();
-  }, []);
+    let isMounted = true;
 
-  // Fetch winners when selectedYear changes
-  useEffect(() => {
-    if (selectedYear === null) return;
-
-    const fetchAllData = async () => {
+    const fetchWinners = async () => {
       try {
         setIsLoading(true);
+        const data = await dataService.getWinners(selectedYear ?? undefined);
+        if (!isMounted) return;
 
-        const { data: categories } = await api.get<Category[]>(
-          `/categories?year=${selectedYear}`
-        );
-
-        const promisedResults = categories.map(async (category) => {
-          try {
-            const { data: nominees } = await api.get<NomineeWithStatus[]>(
-              `/categories/${category.id}/nominees`
-            );
-
-            const winnerNominee =
-              nominees.find((n) => n.Winner === true || n.winner === true) ||
-              null;
-
-            return { category, winnerNominee };
-          } catch (err) {
-            console.error(
-              `Failed to load data for category: ${category.title}`,
-              err
-            );
-            return { category, winnerNominee: null };
-          }
-        });
-
-        const results = await Promise.all(promisedResults);
-        setWinnersData(results);
+        setYears(data.years);
+        if (selectedYear === null && data.year) {
+          setSelectedYear(data.year);
+        }
+        setWinnersData(data.categories);
       } catch (error) {
         console.error("Critical error fetching winners:", error);
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
-    fetchAllData();
+    void fetchWinners();
+    return () => {
+      isMounted = false;
+    };
   }, [selectedYear]);
 
   if (isLoading && years.length === 0) {

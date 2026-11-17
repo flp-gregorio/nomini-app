@@ -4,9 +4,23 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000",
 });
 
-api.interceptors.request.use(async (config) => {
-  const token = localStorage.getItem("jwt");
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+function isPublicGetRequest(method?: string, url?: string): boolean {
+  if ((method || "get").toLowerCase() !== "get" || !url) return false;
+  const path = url.split("?")[0];
+  return (
+    path === "/event" ||
+    path === "/categories" ||
+    path.startsWith("/categories/")
+  );
+}
+
+api.interceptors.request.use((config) => {
+  if (!isPublicGetRequest(config.method, config.url)) {
+    const token = localStorage.getItem("jwt");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  }
 
   return config;
 });

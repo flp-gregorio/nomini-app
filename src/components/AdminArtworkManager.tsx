@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import api from "../lib/api";
+import { dataService } from "../services/dataService";
 import { NomineeArtwork } from "../@types/NomineeType";
 
 type AdminNomineeItem = {
@@ -109,16 +110,16 @@ const AdminArtworkManager = () => {
   useEffect(() => {
     const init = async () => {
       try {
-        const [statusRes, yearsRes] = await Promise.all([
+        const [statusRes, yearsData] = await Promise.all([
           api.get<{ steamGridDbConfigured: boolean; igdbConfigured: boolean }>(
             "/artwork/status"
           ),
-          api.get<number[]>("/categories/years"),
+          dataService.getYears(),
         ]);
         setSteamGridConfigured(statusRes.data.steamGridDbConfigured);
         setIgdbConfigured(statusRes.data.igdbConfigured);
-        setYears(yearsRes.data);
-        const latestYear = yearsRes.data[0] ?? null;
+        setYears(yearsData);
+        const latestYear = yearsData[0] ?? null;
         setSelectedYear(latestYear);
         await loadNominees(latestYear);
       } catch (err) {
@@ -283,6 +284,7 @@ const AdminArtworkManager = () => {
           item.name === nomineeName ? { ...item, artwork: data.artwork } : item
         )
       );
+      dataService.invalidateCatalogCache();
       setStatusMessage({ type: "success", text: data.message });
     } catch (err) {
       const error = err as { response?: { data?: { message?: string } } };
@@ -299,6 +301,7 @@ const AdminArtworkManager = () => {
     setItemBusy(nomineeName, true);
     try {
       await api.delete(`/artwork/${encodeURIComponent(nomineeName)}`);
+      dataService.invalidateCatalogCache();
       setNominees((prev) =>
         prev.map((item) =>
           item.name === nomineeName ? { ...item, artwork: null } : item
@@ -357,6 +360,7 @@ const AdminArtworkManager = () => {
           return saved ? { ...n, artwork: saved } : n;
         })
       );
+      dataService.invalidateCatalogCache();
       setStatusMessage({ type: "success", text: data.message });
     } catch (err) {
       const error = err as { response?: { data?: { message?: string } } };
