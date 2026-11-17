@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AxiosError } from "axios";
 import CardComponent from "../../components/CardComponent";
 import NavigationComponent from "../../components/NavigationComponent";
-import CategoryNavigationGrid from "../../components/CategoryNavigationGrid";
+import CategoryNavigationGrid, {
+  type CategoryGridItem,
+} from "../../components/CategoryNavigationGrid";
 import ButtonComponent from "../../components/ButtonComponent";
 import api from "../../lib/api";
 
@@ -307,6 +309,16 @@ const Nominees = () => {
     }
   };
 
+  const categoryGridItems = useMemo<CategoryGridItem[]>(
+    () =>
+      categories.map((category) => ({
+        id: category.id,
+        title: category.title,
+        hasVoted: Boolean(category.title && savedNominees[category.title]),
+      })),
+    [categories, savedNominees]
+  );
+
   if (isLoading) {
     return (
       <div className="w-full max-w-[1760px] mx-auto px-[clamp(16px,3vw,48px)] py-16 flex flex-col items-center justify-center min-h-[60vh]">
@@ -481,7 +493,7 @@ const Nominees = () => {
       </div>
 
       <CategoryNavigationGrid
-        categories={categories}
+        categories={categoryGridItems}
         currentIndex={currentCategoryIndex}
         onSelectCategory={handleSelectCategory}
       />
